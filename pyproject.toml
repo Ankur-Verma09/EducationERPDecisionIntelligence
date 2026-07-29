@@ -1,0 +1,69 @@
+[build-system]
+requires = ["hatchling>=1.27,<2"]
+build-backend = "hatchling.build"
+
+[project]
+name = "education-erp-decision-intelligence"
+version = "0.1.0"
+description = "Secure foundation for the Education ERP Decision Intelligence Platform"
+readme = "README.md"
+requires-python = ">=3.11,<3.13"
+dependencies = [
+  "alembic>=1.14,<2",
+  "fastapi>=0.140.13,<1",
+  "pydantic-settings>=2.7,<3",
+  "psycopg[binary]>=3.2,<4",
+  "sqlalchemy>=2.0,<3",
+  "uvicorn[standard]>=0.34,<1",
+]
+
+[project.optional-dependencies]
+dev = [
+  "bandit[toml]>=1.8,<2",
+  "cyclonedx-bom>=5,<6",
+  "httpx2>=2.9.1,<3",
+  "mypy>=1.14,<2",
+  "pip-audit>=2.8,<3",
+  "pytest>=9.0.3,<10",
+  "pytest-cov>=6,<7",
+  "ruff>=0.9,<1",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/education_erp"]
+
+[tool.pytest.ini_options]
+addopts = "--strict-config --strict-markers --cov=education_erp --cov-report=term-missing --cov-fail-under=90"
+testpaths = ["tests"]
+markers = [
+  "integration: tests requiring a database service",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "S", "SIM", "RUF"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = ["S101"]
+
+[tool.bandit]
+exclude_dirs = ["tests"]
+skips = ["B104"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+packages = ["education_erp"]
+
+[tool.coverage.run]
+branch = true
+source = ["education_erp"]
+
+[tool.coverage.report]
+exclude_lines = [
+  "if __name__ == .__main__.:",
+  "pragma: no cover",
+]
