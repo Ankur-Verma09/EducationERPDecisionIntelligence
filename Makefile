@@ -25,7 +25,7 @@ security:
 	pip-audit
 
 sbom:
-	cyclonedx-py environment --output-format JSON --output-file sbom.json
+	cyclonedx-py environment --output-format JSON --outfile sbom.json
 
 check: lint type test security
 

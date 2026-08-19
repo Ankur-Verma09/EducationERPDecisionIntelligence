@@ -1,0 +1,236 @@
+ERP Migration & Integration Plan
+Risk-complete playbook for cloud, on-premises, hybrid and file-based institutional systems
+1. Purpose and recommended strategy
+Use integration first, coexistence second and selective ERP replacement only after institutional approval. During discovery and pilot, the existing ERP remains authoritative. Education Success OS initially provides unified workflows, interventions, analytics and AI assistance. Record ownership moves only after reconciliation, acceptance and a signed cutover decision.
+Guiding controls
+No production cutover without a rehearsed rollback.
+No direct AI write access to source or canonical databases.
+No cross-tenant data movement.
+No assumption that institutions using the same ERP share the same schema.
+No silent data correction; every transformation is traceable.
+No inbound firewall exposure for an on-premises connector by default.
+No source retirement until retention, audit and legal obligations are satisfied.
+2. Deployment and migration decision tree
+If the ERP is SaaS with stable APIs, use API-based incremental synchronization and vendor webhooks.
+If the ERP is SaaS with weak or rate-limited APIs, combine scheduled exports, incremental calls and reconciliation.
+If the ERP runs locally, install a read-limited Institution Connector Agent inside the network. It initiates outbound encrypted connections and buffers data during outages.
+If cloud transfer is prohibited, deploy Core and approved AI services on premises, or synchronize only de-identified projections.
+If the institution keeps its ERP, use permanent coexistence and position Education Success OS as the intelligence and orchestration layer.
+If the institution replaces its ERP, cut over by domain: identity and reference data, academics, attendance, assessment, fees, library and remaining modules.
+If no database or API is accessible, ingest controlled CSV, Excel, XML or JSON exports through secure SFTP or a watched folder.
+If records are partly paper-based, use controlled digitization with dual verification and exception queues.
+3. Target integration architecture
+Local or cloud systems feed source-specific adapters. Adapters send records through mapping and validation to canonical education commands. Domain services validate ownership and rules, write to their PostgreSQL schemas and publish durable outbox events. Search, reporting and AI stores are rebuildable projections.
+Local ERP / database / export folder
+→ Institution Connector Agent
+→ encrypted outbound channel
+→ Integration Gateway
+→ staging and malware scan
+→ schema mapping and validation
+→ canonical commands
+→ domain services and reconciliation
+Connector controls
+Use least-privilege, preferably read-only source accounts.
+Store credentials in an operating-system or enterprise secrets vault.
+Use mutual TLS, tenant-bound certificates and certificate rotation.
+Persist checkpoints so synchronization resumes without duplication.
+Encrypt the bounded local buffer and enforce retention limits.
+Sign connector packages and support controlled update and rollback.
+Monitor health, last sync, lag, rejected records and disk capacity.
+Support an offline export package where continuous connectivity is forbidden.
+4. Canonical education data model
+Adapters understand individual ERP formats; Core services understand only the canonical model. Core entities include institution, campus, department, academic period, programme, course, section, student, guardian, employee, role, enrolment, timetable, attendance, assessment, grade, fee, payment, scholarship, library item, member, loan, reservation, fine, consent and intervention case.
+Every canonical record carries tenant_id, source_system, source_record_id, source_version, effective_time, ingestion_time, correlation_id and data_classification. Sensitive attributes are classified and minimized.
+Mappings are versioned per institution. Value translations, dates, timezones, currencies, code lists, defaults and calculations are testable configuration rather than hard-coded domain logic.
+5. Migration phases and gates
+Phase 0 — Sponsorship and scope
+Confirm sponsor, owners, modules, campuses, regulations, success measures, downtime and decision authority.
+Gate: signed scope and ownership matrix.
+Phase 1 — Technical and data discovery
+Inventory servers, operating systems, database engines and versions, network zones, modules, customizations, APIs, integrations, jobs, files, volumes, growth, peaks and retention.
+Gate: approved source inventory, classification and connectivity decision.
+Phase 2 — Data assessment
+Measure completeness, uniqueness, validity, integrity, orphans, duplicates, encoding, dates and inconsistent codes. Identify the authoritative source for duplicated fields.
+Gate: quality baseline and remediation owners.
+Phase 3 — Mapping and connector design
+Define source-to-canonical mapping, identity matching, deletion semantics, frequency and conflicts. Build adapter configuration and contract tests.
+Gate: business and technical owner approval.
+Phase 4 — Secure infrastructure
+Install connector, secrets, certificates, firewall rules, monitoring and secure staging. Test connectivity, throughput and recovery.
+Gate: security and infrastructure approval.
+Phase 5 — Historical trial
+Load a representative slice into non-production. Compare counts, financial totals, attendance, grades, library balances and sampled fields.
+Gate: thresholds achieved and defects assigned.
+Phase 6 — Incremental pilot
+Test change capture, timestamp deltas, webhooks or scheduled extracts. Verify checkpoints, duplicate suppression, deletes, late and out-of-order events.
+Gate: lag, accuracy and recovery targets achieved.
+Phase 7 — Acceptance and rehearsal
+Test institutional journeys with administrators, teachers, finance, librarians, students and parents. Rehearse support, restore, cutover and rollback.
+Gate: business and operations sign-off.
+Phase 8 — Production cutover
+Freeze only required functions, run final delta, reconcile, enable approved target writes and monitor critical journeys through a command centre.
+Gate: stabilization metrics met.
+Phase 9 — Hypercare
+Monitor defects, lag, queues, data quality, performance, adoption and support load. Resolve mapping exceptions before expansion.
+Gate: steady-state service levels met.
+Phase 10 — Selective decommissioning
+Retire modules only after retention export, audit validation, dependency review, backup proof and written approval. Keep read-only archives when required.
+Gate: decommission certificate and recovery evidence.
+6. Database and format variations
+Different database engine
+Problem: SQL Server, Oracle, PostgreSQL, MySQL, MariaDB, MongoDB, proprietary stores or desktop databases.
+Solution: engine-specific adapters behind one connector interface. Prefer vendor APIs; otherwise use supported drivers and read-only views. Normalize before domain services.
+Fallback: signed scheduled exports with checksums and reconciliation.
+Customized or unknown schema
+Problem: custom tables, renamed columns and institution-specific modules.
+Solution: schema discovery, representative profiling and owner-led mapping. Store mappings per tenant and version. Never infer meaning only from a column name.
+Fallback: vendor-supported views or reports.
+Legacy database version
+Problem: unsupported drivers, encryption or change capture.
+Solution: a compatible read-only connector runtime near the source transfers normalized encrypted batches to the modern gateway.
+Fallback: periodic export and reconciliation.
+Different encoding or language
+Problem: legacy encodings and multiple scripts.
+Solution: detect encoding, normalize Unicode carefully, retain original values for audit and test multilingual round-trips.
+Fallback: quarantine unconvertible values; never replace silently.
+Dates, timezones and calendars
+Problem: ambiguous dates, local time, UTC, daylight-saving changes and custom academic periods.
+Solution: retain source value; store effective time with timezone and explicit parsing/calendar rules.
+Fallback: reject ambiguous records instead of guessing.
+Different identifiers
+Problem: admission number, roll number, email, government ID and historical IDs may refer to one person.
+Solution: tenant-scoped master identity with source aliases, deterministic rules and scored human review.
+Fallback: provisional identity and merge-review queue.
+7. Synchronization and coexistence exceptions
+No change-data capture
+Use updated timestamps, increasing keys, audit tables or snapshot comparison. Store watermarks with overlap windows.
+Unreliable timestamps
+Use row hashes and snapshot differencing with source-version evidence.
+API rate limits
+Throttle, batch, back off with jitter and prioritize critical domains. Monitor quota and catch-up time.
+Internet outage
+Buffer encrypted bounded batches locally and resume from the last acknowledged checkpoint. Local ERP operations continue.
+Source unavailable
+Pause without advancing the checkpoint. Preserve the last consistent state and reconcile the missing interval after recovery.
+Duplicate or replayed records
+Use idempotency keys based on tenant, source, entity and version. Consumers persist processed event IDs.
+Late or out-of-order records
+Compare source version and effective time. Reject stale destructive changes or apply the domain conflict policy.
+Deleted source record
+Define per-entity behavior: soft delete, deactivate, anonymize, retain or ignore. Financial, academic and audit records normally require retention.
+Two systems update the same field
+Maintain a field-level authority matrix. Only the authoritative system writes; conflicts enter review.
+Circular synchronization
+Tag origin and correlation ID. Do not export a change back to its origin unless the contract requires acknowledgement.
+8. Data quality and reconciliation
+Validate files, batches, records and fields. Quarantine invalid records without blocking valid records unless atomic consistency is required.
+Reconcile using counts, distinct IDs, financial sums, attendance totals, grade distributions, library items and balances, plus sampled field comparisons. Reports separate expected transformations from defects.
+Financial balances normally require exact reconciliation. Identity, enrolment and current academic data require near-complete reconciliation with every exception explained. Historical optional data may use an approved tolerance.
+Exception flow
+Detected → classified → assigned → corrected at source or mapping → replayed → reconciled → closed.
+Every override records actor, reason, evidence and approval.
+9. Security, privacy and compliance
+Excessive source access
+Use least-privilege accounts, read-only views and field allowlists. Log connector queries and administration.
+Unnecessary sensitive data
+Minimize at extraction. Mask, tokenize or exclude health, disability, financial and government identifiers unless approved use requires them.
+Credential compromise
+Use short-lived credentials where possible, vault storage, rotation, tenant-bound certificates and immediate revocation. Never store secrets in mapping files or logs.
+Data residency restriction
+Use an approved region, on-premises deployment or approved projections. Record where backups, logs, vectors and model requests are processed.
+Consent and purpose limitation
+Migrate consent and preferences. Enforce tenant, purpose and role authorization at retrieval and action time.
+Correction or deletion request
+Use authoritative correction workflows, apply retention holds and retain non-personal audit proof where permitted.
+Self-hosted AI deployment and data residency
+Use a self-hosted model gateway with tenant policy, egress deny-by-default controls, private model endpoints, licence-approved open-weight models and redaction. Do not send model requests to externally billed AI APIs in normal operation, and do not train a shared model on tenant data by default.
+Audit gap
+Record extraction, transformation, approval, AI evidence, model/prompt version, tool calls, target result and reconciliation.
+10. Performance and scale risks
+Large historical volume
+Partition by campus, academic period and domain; use resumable batches and controlled parallelism.
+Peak impact on the ERP
+Throttle reads, use replicas or reporting views and avoid admission, attendance and examination peaks.
+Slow queries
+Select required columns, use indexed watermarks and paginated reads. Obtain DBA approval before adding source indexes.
+Backlog after outage
+Prioritize critical domains, control catch-up rate and shed nonessential projections. Publish recovery estimates.
+One lakh registered users
+Capacity-test concurrent active users. Scale stateless services horizontally; use pooling, Redis, PostgreSQL replicas, OpenSearch, queue backpressure and independent AI workers.
+AI latency or outage
+Keep Core workflows available. Use timeouts, circuit breakers and clear degraded-state messaging. Never block attendance, fees, library or emergency communication on AI.
+11. Testing strategy
+Contract tests cover adapter and canonical schema versions.
+Transformation tests cover nulls, codes, dates, multilingual text, large values and duplicate IDs.
+Integration tests cover authentication, retries, checkpoints, event replay, dead-letter queues and authorization.
+Reconciliation tests compare control totals and sampled records.
+Security tests cover secrets, certificates, tenant isolation, log redaction and vulnerabilities.
+Performance tests cover peak reads, bulk loads, backlog recovery, portal concurrency and AI isolation.
+Resilience tests interrupt databases, networks, queues, storage, GPU inference nodes, model-serving containers and connectors.
+User tests cover admissions, enrolment, timetable, attendance, assessment, fees, library, communication, intervention and reporting.
+Rollback rehearsals prove return to the last stable mode.
+12. Cutover models
+Parallel run
+Both systems operate temporarily; recommended for high-risk domains. Define one authoritative writer.
+Phased domain cutover
+Move modules separately and avoid attendance or assessment ownership changes during examinations.
+Campus-by-campus
+Useful for operationally independent campuses. Prevent reports from mixing partially migrated semantics.
+Big bang
+Use only for small, simple systems with proven rollback and explicit leadership acceptance.
+Read-only intelligence launch
+Lowest-risk start: synchronize data and enable dashboards/interventions while operational writes remain in the ERP.
+13. Go/no-go and rollback
+Proceed only when backups are verified, final delta completes, reconciliation passes, critical journeys pass, support and monitoring are active, decision makers are available, rollback is achievable, security approval is current and open defects are within approved limits.
+Stop or roll back when financial totals differ unexplained, tenant isolation is uncertain, current identity/enrolment integrity fails, critical integrations are unavailable, source recovery is uncertain, severe performance degradation occurs, auditing is incomplete or the rollback window is at risk.
+Rollback is domain-specific: disable target writes, preserve evidence, stop outbound sync, restore the previous authority matrix and replay only verified source changes. Do not automatically reverse financial or externally communicated actions without approval.
+Maintain the cutover checkpoint, immutable manifest, mapping versions, batch hashes, backups, pending-message inventory and external-action list. After rollback, reconcile both systems and schedule a new rehearsal.
+14. Vendor and organizational risks
+Vendor refuses database access
+Use licensed APIs, reporting views or exports. Include vendor lead time. Never bypass licensing or security.
+Vendor changes API or schema
+Version adapters and mappings, detect schema drift, run compatibility tests and temporarily support parallel versions.
+No documentation
+Combine profiling, interviews and observed reports. Require owner approval for uncertain mappings.
+Key employee unavailable
+Document credentials, customizations, mappings and runbooks; assign primary and backup owners.
+Process changes mid-migration
+Freeze critical decisions per release. Route new requirements through change control and regression testing.
+Low user adoption
+Provide role-based training, champions, sandbox practice, contextual help and adoption monitoring.
+Conflicting definitions
+Create a glossary and authority matrix for active student, attendance, outstanding fee and completion before reporting.
+Budget or schedule pressure
+Protect security, reconciliation and rollback gates. Reduce scope or historical depth instead of skipping controls.
+15. AI-specific risks
+Poor history may create misleading risk scores. Start with descriptive insights, evaluate subgroup performance and require human review before automation.
+Documents may contain prompt injection, obsolete policy or unauthorized data. Apply authorization, scanning, metadata filters, citations and tool guardrails.
+Model behavior can change. Version models, prompts, retrieval configuration and evaluation datasets; regress before promotion.
+Do not train a general shared model on institutional data by default. Begin with retrieval-augmented generation, rules and conventional predictive models only for validated use cases. Training requires explicit purpose, lawful basis, representative data, de-identification where possible, evaluation, approval and monitoring.
+16. Post-migration operating model
+Integration operations own connector health, lag, rejected records, certificates, queues and vendor changes.
+Data stewards own definitions, mappings, quality exceptions and reconciliation.
+Security owns access reviews, incidents, secrets, residency and audit.
+Domain owners approve authority changes and cutovers.
+Platform operations own releases, backups, capacity, observability and disaster recovery.
+AI governance owns approved use cases, evaluations, model changes and human-approval policy.
+Define service objectives for connector availability, synchronization lag, record freshness, reconciliation completion, incident response, recovery time and recovery point per institution and domain.
+17. Required migration deliverables
+Approved scope and stakeholder matrix.
+Source, interface and dependency inventory.
+Data classification and residency assessment.
+Source-to-canonical mapping specification.
+Field-level authority and conflict matrix.
+Connector installation and security runbook.
+Data-quality baseline and remediation plan.
+Test evidence and defect register.
+Reconciliation reports and approval record.
+Cutover, communication and go/no-go plan.
+Rollback plan and rehearsal evidence.
+Hypercare dashboard and escalation matrix.
+Retention, archive and decommission plan.
+Post-migration review and lessons learned.
+18. Final acceptance criteria
+Migration completes only when all in-scope data has an authoritative owner; reconciliation meets approved thresholds; exceptions have owners and deadlines; critical journeys pass; tenant and role authorization are verified; audit evidence is complete; backup and recovery pass; monitoring and support operate; users are trained; and the institution signs stabilization or decommissioning.
+Commercial recommendation
+Sell Education Success OS as integration-first. Institutions retain their ERP, adopt intelligence and workflow modules first, and replace individual ERP functions only after value, readiness and operational safety are proven.

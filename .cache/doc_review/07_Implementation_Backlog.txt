@@ -1,0 +1,353 @@
+Implementation Backlog
+Development sequence, sprint outcomes and acceptance gates
+1. Delivery model
+Use two-week sprints, trunk-based development, short-lived branches and automated deployments to a shared development environment. The plan assumes a focused team and delivers a pilot-capable release in approximately twelve to fourteen sprints. Change scope rather than removing security, tenant isolation, reconciliation or rollback gates.
+Recommended initial team
+One technical lead or architect.
+Two to three Python backend engineers.
+One TypeScript frontend engineer.
+One integration/data engineer.
+One AI/ML engineer, joining full-time after the Core foundation.
+One QA automation engineer.
+One platform/DevOps engineer, initially shared.
+One product owner/business analyst with access to institutional subject-matter experts.
+Part-time security, data-governance and UX support.
+Delivery streams
+Platform foundation.
+Core domains and portal.
+ERP integration and data migration.
+Workflow, library and reporting.
+AI and evaluation.
+Quality, security, operations and pilot readiness.
+2. Priority rules
+P0 work blocks all dependent development or protects tenant/security/data correctness.
+P1 work is required for the first institutional pilot.
+P2 work improves usability, scale or additional use cases but can follow the pilot.
+Build vertical slices. Each sprint should finish at least one user journey from portal through API, authorization, database, audit and automated tests. Avoid building every database first and every screen later.
+3. Sprint 0 — Product and engineering inception
+Objective
+Remove decisions that would cause architectural rework and establish the working agreement.
+Backlog
+Confirm pilot institution, ERP/vendor contacts and integration method.
+Approve MVP modules and explicitly deferred modules.
+Define personas, tenant hierarchy, role hierarchy and student/guardian relationships.
+Define first ten critical user journeys and their acceptance criteria.
+Create system context, threat model and data-classification workshop outputs.
+Approve source-of-truth and field-authority matrix.
+Create canonical terminology and data-dictionary skeleton.
+Choose identity, email/SMS and object storage components. Select licence-approved open-weight generation, embedding and optional reranker models; record their licences and checksums; and select the development GPU plus vLLM serving configuration.
+Define environments, branching, release, incident and change-control process.
+Create initial architecture decision records.
+Exit gate
+Product scope, authority matrix, pilot integration path, security constraints and Definition of Done are approved. Unknowns are recorded with owners and decision deadlines.
+4. Sprint 1 — Monorepo and local platform
+Objective
+Every engineer can clone, start, test and observe the platform locally.
+Backlog
+Create uv and pnpm/Turborepo workspaces.
+Create Python service and domain-package templates.
+Create Next.js application shell and shared UI package.
+Add PostgreSQL, Redis, Kafka-compatible broker, Temporal, OpenSearch, object storage and telemetry through Compose. Add a separate self-hosted AI inference profile containing the model router, embedding service and vLLM GPU server.
+Create Core and AI Compose profiles with separate networks and resource limits.
+Create environment configuration validation and secrets placeholders.
+Add lint, formatting, typing, unit-test and build commands at the repository root.
+Add CI pipeline, dependency caching, security scanning and container builds.
+Add OpenTelemetry, structured logging, request IDs and health/readiness endpoints.
+Create seed framework and mock ERP fixtures.
+Acceptance
+A new developer starts the complete stack with one documented command.
+CI blocks formatting, type, test, contract and secret-scan failures.
+Core remains healthy when the AI profile is stopped.
+A sample request is traceable from gateway to database and back.
+5. Sprint 2 — Tenant, identity and authorization foundation
+Objective
+Create secure multi-tenant access before business data enters the system.
+Backlog
+Implement tenant, campus and department models.
+Integrate development OIDC provider and token verification.
+Implement user invitations, identity linking, session/revocation records and service accounts.
+Implement roles, permissions, campus/department scope, guardian relationship and delegation model.
+Create authorization middleware and repository tenant filters.
+Create gateway routes, rate limits and request correlation.
+Build login, tenant selection, unauthorized and profile screens.
+Add audit records for login, invitation, role and configuration actions.
+Create tenant-escape security test suite.
+Acceptance
+A user cannot query another tenant by changing URL, request body or identifier.
+Every mutation records tenant, actor and request ID.
+Role and scope changes take effect according to the documented token/cache policy.
+Privileged roles require the configured stronger authentication policy.
+6. Sprint 3 — Canonical academic model
+Objective
+Create the stable education data contracts consumed by every later module.
+Backlog
+Implement persons, students, guardians, employees, programmes, courses, sections, academic periods and enrolments.
+Implement source aliases and master-identity matching foundations.
+Create canonical import command contracts and idempotent upsert behavior.
+Create OpenAPI specifications and generated TypeScript client.
+Publish person and enrolment domain events through the outbox.
+Build administrator list/detail pages with permission-aware fields.
+Create data dictionary, validation rules and representative fixtures for school, college and university structures.
+Acceptance
+Repeated canonical commands do not duplicate records.
+Every record is tenant-scoped and retains source lineage.
+Breaking contract changes fail CI.
+School, college and university fixtures can coexist without separate code branches.
+7. Sprint 4 — Integration framework and mock connector
+Objective
+Prove the complete extraction-to-reconciliation pipeline before connecting a real ERP.
+Backlog
+Implement connector, mapping set, mapping version, job, watermark, batch and validation-error models.
+Create adapter interface for API, database and file sources.
+Build a mock ERP adapter with realistic bad and late records.
+Implement staging, schema validation, mapping execution and canonical command dispatch.
+Implement encrypted credential-reference handling.
+Implement checkpoint acknowledgement, retries, dead letters and replay.
+Create reconciliation counts and field-sample report.
+Build connector registration, test, run-history and health screens.
+Publish connector lifecycle events and dashboards.
+Acceptance
+A mock dataset synchronizes into canonical records and produces a reconciliation report.
+Invalid records are quarantined without losing valid records.
+A killed worker resumes without duplication or skipped committed data.
+No integration component writes an academic domain table directly.
+8. Sprint 5 — First real ERP connector
+Objective
+Synchronize representative pilot data safely from the institution’s environment.
+Backlog
+Complete source discovery and approved extraction design.
+Implement the required REST, database or file adapter.
+Create institution-specific versioned mapping configuration.
+Install or package the Institution Connector Agent when the ERP is local.
+Add read limits, query timeouts, local encrypted spool and health telemetry.
+Run schema-drift and mapping contract tests.
+Load a non-production historical sample.
+Resolve identity, encoding, date, timezone and code-list exceptions.
+Produce reconciliation report and remediation backlog.
+Acceptance
+Source administrators approve access and performance impact.
+Sample reconciliation meets agreed thresholds or every exception has an owner.
+Offline interruption, resume and credential rotation are demonstrated.
+The connector cannot execute unapproved arbitrary source queries.
+9. Sprint 6 — Intervention workflow vertical slice
+Objective
+Turn synchronized signals into owned, auditable human work.
+Backlog
+Implement case, assignment, task, evidence, comment, state history, outcome and SLA models.
+Implement state transitions, validation, optimistic concurrency and idempotency.
+Implement Temporal workflows for SLA timers, reminders and escalation.
+Build staff work queue, case detail, assignment and transition screens.
+Add manual case creation from a student profile.
+Create notification events and audit records.
+Create role rules for teacher, counsellor, principal/dean and administrator.
+Acceptance
+An authorized teacher creates a case, assigns it, adds evidence and resolves it.
+Unauthorized roles cannot view or modify the case.
+Duplicate transition requests do not duplicate state or notifications.
+SLA breach is detected after restart and produces an escalation event.
+10. Sprint 7 — Notification and reporting read models
+Objective
+Deliver timely communication and fast role-specific dashboards.
+Backlog
+Implement templates, preferences, channel policy, delivery attempts and receipts.
+Integrate one development email provider and a provider abstraction for SMS/other channels.
+Build event-driven student-success summary, work-queue, connector-freshness and leadership read models.
+Create teacher, principal/dean, owner and administrator dashboards.
+Implement cache rules and event-driven invalidation.
+Add digest scheduling and delivery-failure handling.
+Add accessibility, low-bandwidth and responsive portal checks.
+Acceptance
+Dashboards do not execute cross-service transactional joins on request.
+Failed messages retry safely and appear in an operations queue.
+Users receive only messages allowed by tenant policy and preferences.
+Core dashboards meet the agreed pilot latency under representative load.
+11. Sprint 8 — Library module
+Objective
+Close the identified functional gap with a module that supports synchronization or native operation.
+Backlog
+Implement libraries, catalogue records, copies, members, loans, renewals, reservations, fines and circulation policies.
+Add provider aliases and library connector mapping contracts.
+Implement item search, availability, issue, return, renew and reserve APIs.
+Build librarian circulation screens and student/parent loan views.
+Create overdue workflow and notifications.
+Publish loan, overdue and fine events to reporting and intervention rules.
+Implement conflict rules when an existing library system is authoritative.
+Acceptance
+A librarian completes issue, return, renewal and reservation journeys.
+Concurrent issue attempts cannot loan the same copy twice.
+Existing-system mode prevents unauthorized native write ownership.
+Outstanding loans and fines reconcile with the source during pilot migration.
+12. Sprint 9 — Document and knowledge foundation
+Objective
+Create an authorized institutional knowledge base before adding generative answers.
+Backlog
+Implement document metadata, versions, access labels, effective dates and retention records.
+Add upload, malware scan, object storage and text extraction pipeline.
+Implement chunking and provenance storage.
+Index authorized text in OpenSearch and embeddings in pgvector.
+Create tenant, scope, status and effective-date filters before ranking.
+Build document administration, search and access-review screens.
+Create retrieval evaluation dataset using approved pilot documents.
+Acceptance
+Users cannot retrieve chunks from unauthorized tenants or scopes.
+Every search result identifies the source document and effective version.
+Deletion or access-label changes remove or update search and vector projections.
+Retrieval evaluation has agreed baseline recall and latency measurements.
+13. Sprint 10 — Grounded AI assistant
+Objective
+Provide useful answers with citations while keeping all core functions independent.
+Backlog
+Implement AI gateway, tenant policy, quotas, sessions and streaming. Deploy the pinned open-weight model through the model router and vLLM; expose only an internal inference endpoint.
+Implement retrieval orchestration and approved Core read tools.
+Implement prompt templates, output schema validation, citation validation and refusal behavior.
+Exclude unnecessary personal data before constructing the self-hosted model context.
+Record model checksum, adapter version, prompt, retrieval sources, tool calls, latency, tokens, GPU/inference deployment and result in AI audit.
+Build portal assistant with sources, feedback and clear unavailable state.
+Create evaluation harness for groundedness, citation, leakage, injection and refusal.
+Add provider timeout, circuit breaker and fallback behavior.
+Acceptance
+Answers cite only authorized evidence supplied to the model.
+Prompt-injection test documents cannot expand tool or tenant access.
+Stopping AI leaves all Core journeys operational.
+A prompt, open-weight model, quantization, adapter, embedding model or inference configuration change cannot deploy without licence verification, checksum registration and evaluation regression results.
+14. Sprint 11 — Rules and risk scoring in shadow mode
+Objective
+Generate explainable signals without allowing automated adverse action.
+Backlog
+Define approved pilot risk use case, outcomes and exclusions.
+Create time-valid feature snapshots from event projections.
+Implement deterministic rules and a simple interpretable baseline model.
+Store version, feature time, score, threshold and reason codes.
+Create suppression, duplicate-case and human-review policy.
+Run historical backtest and subgroup error analysis.
+Expose predictions only to an evaluation dashboard in shadow mode.
+Capture reviewer feedback without changing model automatically.
+Acceptance
+No score uses data unavailable at the prediction time.
+Every score has reason codes and model/policy version.
+Performance, calibration and subgroup findings are documented.
+Business and governance owners approve or reject progression from shadow mode.
+15. Sprint 12 — Security, resilience and performance hardening
+Objective
+Prove that the pilot can fail safely and recover.
+Backlog
+Complete threat-model mitigations and penetration-test preparation.
+Run tenant-isolation, broken-object authorization, webhook replay, SSRF, malicious file and prompt-injection tests.
+Run database backup, point-in-time restore, object restore and projection rebuild exercises.
+Run steady-state, burst, slow-dependency, broker-backlog, GPU-saturation, inference-queue and complete AI-outage load tests.
+Tune indexes, pools, caching, queue partitions and worker concurrency from measurements.
+Create SLO dashboards and alerts.
+Write runbooks for connector, database, broker, search, notification, AI and tenant incidents.
+Generate SBOMs and sign release images.
+Acceptance
+No open critical security defect.
+Restore and rollback complete within approved objectives.
+Core latency and error targets pass representative load.
+AI saturation cannot starve Core resources.
+Every alert has an owner and linked runbook.
+16. Sprint 13 — Pilot migration and user acceptance
+Objective
+Operate the complete solution with approved pilot data and users before production cutover.
+Backlog
+Run historical trial and incremental synchronization.
+Reconcile current identities, enrolments, library balances and selected academic data.
+Create pilot users, roles and scoped permissions.
+Execute administrator, teacher, librarian, student and parent acceptance journeys.
+Train administrators, data stewards, support and pilot champions.
+Rehearse cutover, rollback, incident and communication plans.
+Run AI in approved scope and risk scoring in shadow mode.
+Capture defects, adoption issues and operational metrics.
+Acceptance
+Reconciliation gates pass or exceptions are formally accepted.
+Critical journeys pass with named business owners.
+Cutover and rollback are rehearsed, timed and approved.
+Support, escalation, monitoring and communication are operational.
+17. Sprint 14 — Production cutover and hypercare
+Objective
+Move approved capabilities into production with controlled ownership.
+Backlog
+Apply the go/no-go checklist and freeze required source functions only.
+Take final delta and verify control totals.
+Enable target writes only for approved domains.
+Monitor connector lag, queues, database, search, notifications, AI and user journeys through a command centre.
+Hold daily defect and reconciliation review during hypercare.
+Track adoption, support load, response times and data-quality exceptions.
+Close or assign all residual exceptions.
+Complete stabilization review and next-release prioritization.
+Acceptance
+No unexplained critical reconciliation difference.
+Source-of-truth ownership matches the approved matrix.
+Service levels remain stable through the agreed observation period.
+The institution signs stabilization, extension or rollback decision.
+18. Cross-cutting epics
+Security and privacy
+Tenant isolation, authorization, consent, masking, encryption, secret rotation, audit, retention and incident response are implemented continuously, not postponed to hardening.
+Developer experience
+One-command environment, realistic fixtures, fast tests, generated clients, stable local ports, migration tooling and troubleshooting documentation.
+Observability
+Every new service and important workflow includes logs, metrics, traces, dashboards and actionable alerts.
+Data governance
+Every canonical field has definition, owner, sensitivity, source authority, transformation and retention treatment.
+Accessibility and performance
+Keyboard navigation, readable contrast, responsive layouts, low-bandwidth behavior, pagination, incremental loading and query budgets are part of feature acceptance.
+19. Initial engineering tickets — start here
+P0 Create repository workspaces and root task runner.
+P0 Add Compose Core and AI profiles with network and resource isolation; include a GPU-enabled inference profile for the model router, embeddings and vLLM.
+P0 Create Python service template with configuration, health, telemetry and test harness.
+P0 Create Next.js shell with authentication boundary and generated-client placeholder.
+P0 Define request, error, pagination and idempotency conventions.
+P0 Define event envelope and outbox relay contract.
+P0 Create tenant-aware database base models and migration workflow.
+P0 Add CI for lint, type, unit, contract, image and secret scanning.
+P0 Add mock OIDC provider and tenant fixtures.
+P0 Add mock ERP dataset for school, college and university structures.
+P1 Implement tenant/campus domain and first create/read APIs.
+P1 Implement authorization decision interface and deny-by-default middleware.
+P1 Implement audit-event SDK and append-only store.
+P1 Create initial canonical person and enrolment JSON schemas.
+P1 Create adapter interface and mock ERP connector.
+P1 Create integration staging and reconciliation skeleton.
+20. Environment and release strategy
+Local
+Synthetic data only. All dependencies run through Compose. Developers can run only Core or add AI profile.
+Shared development
+Automatic deployment after main passes. Resettable synthetic or masked data. Used for integration and UI review.
+Test
+Stable environment for automated end-to-end, security and migration tests. Provider sandboxes and representative volumes.
+Pilot/UAT
+Institution-approved data, restricted access and release-candidate images. Changes require migration and rollback evidence.
+Production
+Signed immutable images, controlled promotion, protected secrets, audited access, backups and progressive deployment.
+Promotion path
+The same image digest moves from test to pilot to production. Configuration changes are versioned and validated. Database changes use expand/migrate/contract sequencing. Core and AI release independently.
+21. Pull-request and release gates
+Pull request
+Linked ticket and acceptance criteria.
+Architecture or contract note when boundaries change.
+Tests for new behavior and failure paths.
+Authorization and tenant-scope review.
+Migration and rollback impact.
+Observability and documentation update.
+No secrets or personal production data.
+Release candidate
+All required automated suites pass.
+OpenAPI and event compatibility pass.
+Database migrations tested against a production-like copy.
+Vulnerability findings are within policy.
+AI evaluation passes when AI artifacts change.
+Runbooks and alerts exist for new operations.
+Rollback is documented and, for high-risk changes, rehearsed.
+22. Pilot success measures
+Canonical synchronization completeness and freshness.
+Reconciliation exceptions by severity and time to close.
+Core API latency, error rate and availability.
+Case assignment, SLA adherence and outcome completion.
+Library circulation accuracy where in scope.
+Notification delivery and failure rate.
+Portal adoption by role and task completion.
+AI citation correctness, groundedness, refusal and user feedback.
+Security incidents and unauthorized-access test results.
+Support tickets, resolution time and user satisfaction.
+23. After the first pilot
+Use measured traffic, GPU saturation and total operating cost to size production infrastructure. Keep self-hosted AI mandatory, but scale it independently through larger or additional GPU nodes. Add more ERP adapters through the same connector contract and expand modules in dependency order. Consider native mobile, ClickHouse or a dedicated vector database only when measured requirements justify their operational cost.
+The first development action is Sprint 0 and Sprint 1 in parallel: finalize pilot decisions while the engineering team builds the monorepo, local platform, CI, service templates, telemetry and mock data. This creates progress without locking institution-specific assumptions into the architecture.

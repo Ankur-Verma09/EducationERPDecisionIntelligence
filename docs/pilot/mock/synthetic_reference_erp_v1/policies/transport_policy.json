@@ -1,0 +1,17 @@
+{
+  "classification": "mock-only",
+  "transport": "in-process-read-only-csv-test-double",
+  "network_egress": "disabled",
+  "credential_reference": null,
+  "allowed_operations": ["read_snapshot", "read_page"],
+  "forbidden_operations": ["create", "update", "delete", "execute", "write_back"],
+  "batch_size": 100,
+  "max_record_bytes": 65536,
+  "max_batch_bytes": 5242880,
+  "connect_timeout_seconds": 3,
+  "read_timeout_seconds": 15,
+  "max_attempts": 3,
+  "backoff_seconds": [1, 2, 4],
+  "max_concurrent_jobs_per_tenant": 1
+}
+

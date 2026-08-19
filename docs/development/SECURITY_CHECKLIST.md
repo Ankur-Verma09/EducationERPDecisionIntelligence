@@ -13,7 +13,7 @@ Legend: `[ ]` pending, `[x]` addressed in the Phase 0 documentation baseline.
 
 ## Identity and tenancy
 
-- [ ] Approve tenant boundary and hierarchy.
+- [x] Approve tenant boundary and hierarchy.
 - [ ] Integrate an approved IdP; require MFA for privileged roles.
 - [ ] Enforce server-side RBAC/ABAC and deny by default.
 - [ ] Enforce tenant ownership in application and persistence layers.

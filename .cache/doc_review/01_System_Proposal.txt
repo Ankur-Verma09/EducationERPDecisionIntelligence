@@ -1,0 +1,1750 @@
+System Proposal
+EDUCATION SUCCESS OS
+Development Plan
+and Architecture Design
+Integration-first intelligence and intervention platform for schools, colleges and universities
+Core decision: build the decision-and-intervention layer first; expand into modular ERP replacement only after proving outcomes.
+CONFIDENTIAL WORKING BLUEPRINT
+1. Executive direction
+Build one multi-tenant Education Success Operating System with configurable school, college and university packs. The first commercial product should integrate with existing ERPs, connect fragmented information, surface high-value risks and coordinate measurable interventions. It should not require an institution to replace its system of record during the pilot.
+2. Product principles
+Outcome before automation: each feature must improve a measurable institutional outcome or remove meaningful effort.
+Configuration before forks: schools, colleges and universities share one platform and use different configuration packs.
+Integration before replacement: respect the institution's current system of record.
+Rules for facts, AI for interpretation: fees, eligibility, credits and permissions remain deterministic.
+Human authority for sensitive decisions: grading, admissions, discipline, wellbeing and major financial decisions require accountable people.
+Evidence before recommendation: every important recommendation includes source data, applicable policy and confidence.
+Intervention before dashboard: risks become assigned actions with due dates, escalation and outcome measurement.
+Privacy by design: least-privilege access, consent, auditability and data minimization are platform capabilities.
+3. Product boundaries
+4. Functional division by institution type
+The platform uses shared services plus institution packs. Configuration controls hierarchy, academic structure, terminology, permissions, workflows and compliance obligations.
+4.1 Configurable hierarchy and authorization
+Do not equate job title with access. Model six independent concepts:
+Role: user category such as teacher, faculty member, librarian, principal or registrar.
+Position: the institution-defined job title.
+Scope: campuses, departments, programmes, classes or students visible to the user.
+Permission: operations the user may read, prepare, approve or execute.
+Approval authority: monetary, academic or administrative thresholds.
+Reporting relationship: who supervises, delegates to or escalates from whom.
+4.2 Module catalogue
+5. Recommended product architecture
+Figure 1. The platform starts above existing systems and earns the right to replace weak modules.
+5.1 Architecture objectives
+Support multiple institutions with strict tenant isolation.
+Connect to heterogeneous ERPs without embedding vendor-specific logic in product services.
+Handle both structured records and unstructured policies or evidence.
+Allow read-only pilots before enabling controlled write actions.
+Separate authoritative calculation from probabilistic reasoning.
+Provide explainability, human approval and immutable audit evidence.
+Operate across web, mobile, low-bandwidth and approved messaging channels.
+Scale by institution, campus and academic cycle without separate codebases.
+Figure 2. Five-layer logical architecture with separation between user experience, intelligence and authoritative data.
+5.2 Experience layer
+5.3 Core platform services
+Tenant and organization service
+Identity, role, scope and delegated authority service
+Student, staff, programme and academic-structure services
+Connector gateway and canonical mapping service
+Event ingestion and change-data-capture pipeline
+Workflow, approvals, cases and SLA service
+Notification and communication service
+Document, policy and evidence service
+Audit, consent and data-retention service
+Feature flags, configuration and institution-pack service
+6. Integration architecture
+Every connector maps a source system into the canonical education model. Product services consume canonical records and events rather than vendor-specific schemas.
+6.1 Read and write maturity
+6.2 Canonical data domains
+Organization: tenant, campus, department, programme, cohort and academic period.
+People: student, guardian, employee, identity, relationship, role and scope.
+Academics: curriculum, course, section, enrolment, timetable, attendance, assessment and result.
+Finance: charge, concession, scholarship, invoice, payment, refund and balance.
+Engagement: LMS activity, communication, mentoring, grievance and intervention.
+Operations: library, hostel, transport, facility, inventory and service request.
+Governance: policy, consent, approval, evidence, compliance control and audit event.
+7. AI and decision-intelligence architecture
+Figure 3. All AI requests pass through grounding, authorization, confirmation and outcome tracking.
+7.1 Intelligence components
+7.2 Model-development strategy
+Do not train a foundation model from scratch. Start with a licence-approved multilingual open-weight model running on our GPU infrastructure, then build defensibility in institutional grounding, education data, risk taxonomies, workflow execution and intervention outcomes.
+Phase A - Prompt and tool engineering: evaluate role-aware conversations using synthetic and de-identified scenarios.
+Phase B - Institution-specific RAG: ingest approved documents with ownership, version, effective date and access metadata.
+Phase C - Predictive baselines: begin with interpretable logistic regression, gradient-boosted trees, survival models and time-series forecasts.
+Phase D - Domain adaptation only if justified: use LoRA/QLoRA on the selected open-weight model for intent classification, terminology or multilingual quality, using reviewed, de-identified and licence-approved examples only after the RAG baseline is measured.
+Phase E - Outcome learning: use intervention and outcome history to improve next-best-action recommendations under governance.
+7.3 Predictive training pipeline
+8. Security, privacy and AI governance
+8.1 Autonomy levels
+8.2 Threats to test explicitly
+Cross-student or cross-tenant data exposure
+Prompt injection in uploaded documents
+Outdated policy or incorrect effective date
+Action without confirmation or duplicate submission
+Wrong child selected in a family account
+Incorrect translation of official terminology
+Fabricated source or unsupported explanation
+Prediction presented as a confirmed fact
+Bias, accessibility failure and excessive parent surveillance
+Silent connector, payment or workflow failure
+9. Step-by-step development roadmap
+The roadmap is organized by evidence gates rather than calendar alone. A phase closes only when its stated outcome is demonstrably achieved.
+10. MVP definition
+10.1 MVP users
+Principal, dean or institutional leader
+Teacher, faculty mentor or class coordinator
+Student-support or academic operations staff
+Limited student experience for explanations and follow-up
+Platform administrator and integration operator
+10.2 MVP capabilities
+10.3 Explicitly outside the first MVP
+Complete fee accounting, payroll or general ledger
+Full examination and timetable replacement
+Autonomous high-impact actions
+Mental-health diagnosis
+Training a general-purpose foundation model
+Advanced library acquisitions and circulation replacement
+Simultaneous support for many ERP vendors before the first connector is stable
+11. Library management plan
+Library functionality is required for a complete platform, but it should not delay the intelligence MVP.
+12. Delivery teams and ownership
+12.1 Initial team shape
+A focused first team is approximately 10-14 people: one product/domain lead, one architect, three backend/platform engineers, one data engineer, one ML engineer, one AI engineer, two frontend/mobile engineers, one designer, one QA engineer, one DevOps/SRE engineer and part-time security/privacy expertise.
+13. Engineering standards
+API-first services with versioned contracts and idempotent mutations.
+Infrastructure as code and separate development, staging and production environments.
+Automated unit, contract, integration, authorization and end-to-end tests.
+Synthetic tenant datasets for development; production data prohibited from developer laptops.
+Schema registry and data-contract tests for every connector.
+Feature flags and tenant-specific rollout controls.
+End-to-end observability for user request, retrieval, model/rule call, tool execution and outcome.
+Documented rollback for model, prompt, rule, connector and application releases.
+Accessibility and performance budgets treated as release gates.
+14. Testing strategy
+15. Pilot and rollout plan
+15.1 Pilot success scorecard
+16. Major risks and mitigations
+17. First 90-day execution plan
+18. Key architecture decisions to approve
+Integration-first product entry versus immediate ERP replacement.
+First pilot segment: school, college or university.
+First design-partner ERP/vendor and available data-access method.
+Primary first outcome: retention, admission conversion or accreditation readiness.
+Cloud-hosted versus institution-specific deployment requirements.
+Initial self-hosted open-weight LLM, embedding and reranker selections; GPU deployment profile; licence approval; and data-residency boundary.
+Read-only pilot period and criteria for enabling write actions.
+Commercial success metric and acceptable pilot duration.
+19. Recommended next decision
+Select one design-partner institution and one outcome. The recommended starting point is student retention for a college or university that can provide attendance, assessment, fee, LMS and mentoring data. Build a read-only Student 360, explainable risk model and intervention hub before expanding the ERP surface.
+Appendix A. Suggested technology capabilities
+Appendix B. Definition of done for the first pilot
+No cross-tenant or unauthorized student-data access in the security test suite.
+Every material answer cites a current authorized source or explicitly declines.
+Every risk signal shows supporting data, prediction date and model/rule version.
+Every intervention has an owner, due date, status, evidence and outcome.
+Data totals reconcile with the ERP within agreed tolerances.
+The institution can disable the model, connector or action without taking the portal offline.
+Pilot leaders can quantify value, effort and safety compared with the baseline.
+Engineering HLD
+Education Success OS - Engineering High-Level Design
+Architecture decision record for a 100,000-user, integration-first education platform
+1. Architecture decisions
+Decision 1 - Python is suitable for the backend and AI platform, but the complete system should not be Python-only. Use Python for APIs, domain services, integrations, background workers, data pipelines, machine learning and AI orchestration. Use TypeScript for the browser application because it provides the strongest modern web ecosystem, compile-time UI contracts and better client-side performance and maintainability.
+Decision 2 - Divide the system into two deployment planes: Core Platform (non-AI) and AI/Decision Intelligence. They live in one monorepo, share contracts and platform libraries, but build into different images and deploy independently. AI failure must never make attendance, fees, cases, identity or other core workflows unavailable.
+Decision 3 - A single physical machine is acceptable for local development, demonstration and an early pilot. It is not the production target for 100,000 users. Production must run the same containers across multiple nodes with load balancing, replicated state stores and failure isolation. “100,000 users” is treated as registered users; initial sizing assumes 10,000 daily active users, 2,000 peak concurrent sessions and approximately 500 sustained API requests/second with short bursts to 1,500 requests/second. These numbers must be replaced by measured pilot traffic before procurement.
+Decision 4 - Begin as an integration and intelligence layer over existing ERPs. Every service owns its data and exposes contracts; services must not directly read another service’s tables. Use synchronous APIs for immediate commands and queries, and durable events for propagation and read models.
+Decision 5 - Optimize retrieval with purpose-built stores: PostgreSQL for transactions, Redis for hot data and rate limiting, OpenSearch for lexical/hybrid search, pgvector for the first vector workload, object storage for documents and ClickHouse only when leadership analytics outgrow PostgreSQL read replicas/materialized views.
+2. Quality attributes and design targets
+Availability: Core Platform target 99.9% initially, evolving to 99.95%; AI plane can have a lower independent SLO without affecting core transactions.
+Latency: p95 under 250 ms for cached reads, under 500 ms for ordinary core APIs, under 2 seconds for complex dashboards, and streamed first AI token under 3 seconds when the self-hosted inference service is healthy.
+Scale: stateless services scale horizontally; no user session is stored in an application process.
+Tenant isolation: every request carries tenant, user, role and scope claims; every datastore query enforces tenant boundaries.
+Consistency: strong consistency for identity, finance state, permissions and workflow transitions; eventual consistency for search, analytics, notifications and AI indexes.
+Auditability: immutable record of source data, policy version, rule/model version, recommendation, approval, tool call and outcome.
+Recoverability: defined RPO/RTO, automated backups, point-in-time recovery and tested restoration.
+Accessibility and low bandwidth: responsive PWA, incremental loading, compressed payloads, offline drafts and multilingual UI.
+3. Recommended technology stack
+3.1 Application languages and frameworks
+Backend and AI: Python 3.14.x, pinned by service image. Use FastAPI for HTTP APIs, Pydantic v2 for contracts, SQLAlchemy 2.x plus psycopg 3 for PostgreSQL, Alembic for migrations and gRPC only for high-throughput internal calls that justify the added complexity.
+Web portal: TypeScript 5.x, Next.js 16.2, React 19.x and Node.js 24 LTS. Use server rendering for fast initial pages, a client query cache for interactive screens and generated OpenAPI clients for end-to-end typing.
+Mobile: launch as a responsive installable PWA. Add React Native only after usage data proves that device-specific capabilities or app-store distribution are necessary.
+Data/ML: Polars or DuckDB for local analytical processing, scikit-learn and gradient-boosted trees for interpretable predictive baselines, and PyTorch only when a validated use case needs deep learning.
+3.2 Data and retrieval
+Transactional database: PostgreSQL 18 with PgBouncer, primary plus read replicas, PITR backups and tenant-aware composite indexes.
+Cache/session/rate limits: Redis 8.x cluster. Cache only reconstructable data; never make Redis the sole store for authoritative records.
+Event streaming: Apache Kafka 4.x for durable domain events, connector ingestion and analytics feeds. For a smaller pilot, start with a three-broker-compatible deployment or managed Kafka rather than embedding an in-process queue.
+Search: OpenSearch 3.7 or the latest supported 3.x patch at implementation time. Use it for notices, policies, people/catalogue discovery, logs and hybrid lexical/vector retrieval.
+Vector retrieval: PostgreSQL pgvector 0.8.x with HNSW for MVP knowledge bases. Move very large or specialized vector workloads to an independent vector service only after measured recall, latency and operating-cost evidence.
+Object storage: S3-compatible storage for source documents, exports, evidence and immutable model artifacts. Store only metadata and object keys in PostgreSQL.
+Analytics: begin with PostgreSQL read replicas and materialized views. Add ClickHouse when event volume and multi-dimensional leadership queries justify a columnar analytical store.
+3.3 Workflow, deployment and operations
+Durable workflows: Temporal with Python workers for long-running approvals, ERP synchronization, intervention SLAs and retryable cross-service orchestration.
+Containerization: separate OCI images for each service. Docker Compose profiles for development/pilot; Kubernetes for production horizontal scaling and rolling deployments.
+Gateway: Envoy, Kong or a cloud-managed API gateway for TLS termination, authentication integration, rate limits, routing and request IDs. Do not expose internal services directly.
+Observability: OpenTelemetry instrumentation, Prometheus metrics, Grafana dashboards and centralized logs/traces. Define SLO alerts before production.
+Secrets and keys: cloud KMS/Vault-compatible secret storage. Never put credentials in the monorepo or container image.
+CI/CD: GitHub Actions or equivalent, security scanning, signed images, SBOMs, database migration gates and progressive deployments.
+4. Deployment topology
+Internet / Mobile / ERP Webhooks
+|
+CDN + WAF + Load Balancer
+|
+API Gateway
+/           \
+Core Platform     AI Platform
+(Kubernetes ns)   (separate ns)
+|                |
+PostgreSQL/Redis   Model gateway + retrieval
+\                /
+Kafka + Temporal
+|
+PostgreSQL | OpenSearch | Object Storage
+|
+Analytics read models
+On one machine, Core and AI use separate Compose profiles, networks, service accounts, CPU/memory limits and deployment commands. In production, use separate Kubernetes namespaces and node pools. AI workers may use GPU nodes; core services remain CPU-only. Network policies allow AI services to call only approved read APIs and controlled action tools, never core databases directly.
+4.1 Single-machine pilot boundaries
+Run reverse proxy, core services, AI services, PostgreSQL, Redis, Kafka-compatible broker, OpenSearch and object storage as separate containers.
+Reserve CPU and memory for core services before allocating AI workers. Apply hard resource limits so embedding or model jobs cannot starve login or transactional APIs.
+Use a dedicated self-hosted GPU inference machine during the pilot when shared-machine inference would exceed available memory, GPU capacity or Core isolation limits.
+Back up PostgreSQL and object storage outside the machine. A backup on the same disk is not disaster recovery.
+5. Monorepo and independent-service design
+education-success-os/
+apps/
+web/                         # Next.js portal
+services/core/
+identity/ organization/ academic/
+workflow_case/ integration/ notification/
+document/ search_api/ audit/
+services/ai/
+ai_gateway/ knowledge_ingestion/ retrieval/ model_router/
+embedding_service/ reranker/ inference_vllm/
+risk_scoring/ recommendation/ evaluation/
+packages/python/
+contracts/ authz_sdk/ observability/ event_sdk/ testing/
+packages/typescript/
+api_client/ ui/ auth/ telemetry/
+contracts/
+openapi/ protobuf/ events/ jsonschema/
+db/
+migrations/ seeds/ local/
+deploy/
+compose/ kubernetes/ helm/ terraform/
+tests/
+contract/ integration/ performance/ security/
+docs/
+adr/ runbooks/ data_dictionary/
+Use uv workspaces for Python and pnpm workspaces plus Turborepo for TypeScript. A root task runner provides lint, type-check, test, build and image commands. CI detects changed services but always runs contract compatibility tests for shared schemas.
+5.1 Service rules
+Each service has one bounded business capability, its own API, migrations, deployment image, health checks, SLO and owner.
+Each service owns its database or PostgreSQL schema. Cross-service SQL joins are prohibited.
+Public APIs use versioned REST/JSON. Internal synchronous calls use REST first; introduce gRPC only after profiling.
+Publish domain events through an outbox table in the same transaction as the state change. A relay publishes to Kafka, preventing lost events.
+Consumers are idempotent, store processed event IDs and tolerate replay and out-of-order delivery where the contract permits.
+Shared packages contain infrastructure concerns and contracts, not domain business logic that couples services.
+Deployments are independent: a new AI image, prompt or model cannot require a core-platform release.
+6. Module and service catalogue
+6.1 Core Platform - non-AI deployment
+Identity Service: users, authentication federation, MFA state, sessions, service accounts and token revocation.
+Organization and Authorization Service: tenants, campuses, departments, roles, positions, scopes, relationships, delegations and policy decisions.
+Academic Profile Service: student/staff profiles, programmes, cohorts, enrolments and canonical academic references imported from ERP.
+Integration Service: connectors, source mappings, sync jobs, webhooks, reconciliation, dead-letter handling and connector health.
+Workflow and Case Service: interventions, tasks, approvals, SLAs, escalation, evidence, comments and outcomes.
+Notification Service: templates, preferences, email/SMS/push/approved messaging channels, delivery receipts and digests.
+Document and Policy Service: document metadata, versioning, access labels, effective dates, object-storage keys and evidence relationships.
+Search API Service: authorized query facade over OpenSearch; applies tenant and scope filters before results leave the service.
+Audit Service: append-only security, administrative and AI decision records with retention controls.
+Reporting Read Service: precomputed role-specific summaries; never executes expensive multi-service joins on a user request.
+6.2 AI and Decision Intelligence deployment
+AI Gateway: model routing, prompt templates, token budgets, safety filters, response streaming and provider failover.
+Agent Orchestrator: identity-aware intent routing, retrieval, rule/tool selection, confirmation requirements and action validation.
+Knowledge Ingestion Service: virus scanning, parsing, chunking, metadata extraction, embedding, indexing and policy supersession.
+Retrieval Service: hybrid lexical/vector retrieval, reranking, authorization filters, citations and retrieval-quality telemetry.
+Risk Scoring Service: versioned features, batch/online inference, reason codes, calibration and drift monitoring.
+Recommendation Service: next-best-action candidates constrained by policy, available resources and human approval.
+Evaluation Service: offline test sets, groundedness, retrieval precision, language quality, bias checks and release gates.
+AI Worker Pool: asynchronous ingestion, embeddings, batch scoring and evaluation; horizontally scalable and separately resource-limited.
+7. Database high-level design
+Use one PostgreSQL cluster for the pilot, but separate databases or schemas by service ownership. Every business table includes tenant_id, an ordered UUID/UUIDv7 primary key, created_at, updated_at, version for optimistic concurrency and source lineage when imported. Use row-level security as defense in depth, not as a substitute for service authorization.
+7.1 Core entity groups
+identity_db
+users, external_identities, credentials, sessions, service_accounts
+organization_db
+tenants, campuses, org_units, positions, roles, permissions
+role_bindings, scopes, relationships, delegations
+academic_db
+people, students, guardians, staff, programmes, courses, cohorts
+enrolments, class_sections, attendance_facts, assessment_facts
+integration_db
+connectors, source_entities, id_mappings, sync_runs, sync_errors
+workflow_db
+cases, case_subjects, tasks, approvals, escalations
+interventions, intervention_events, outcomes
+notification_db
+templates, preferences, messages, deliveries, digests
+content_db
+documents, document_versions, policies, chunks_metadata, evidence_links
+audit_db
+audit_events, access_events, ai_decisions, retention_holds
+7.2 AI data structures
+ai_control_db
+model_registry, prompt_versions, tool_definitions, evaluations
+conversations, turns, retrieval_runs, tool_runs, feedback
+feature_db
+feature_definitions, feature_snapshots, prediction_runs
+predictions, explanations, drift_metrics
+vector store
+document_chunk_embeddings(tenant_id, policy_version_id, chunk_id, embedding)
+search index
+authorized denormalized documents with tenant/scope/effective-date fields
+7.3 Indexing and partitioning
+All high-volume indexes begin with tenant_id. Examples: (tenant_id, external_id), (tenant_id, student_id, event_time DESC), (tenant_id, status, due_at) and partial indexes for open/active records.
+Partition append-only attendance, audit, notification delivery and integration event tables by month or academic period after measured size warrants it.
+Use UUIDv7/time-ordered identifiers to reduce random B-tree writes and simplify event ordering.
+Use GIN indexes for JSONB only on queried paths; promote frequently filtered fields into typed columns.
+Use HNSW vector indexes per embedding model and tenant group where necessary. Evaluate recall against exact search before tuning for speed.
+Use PgBouncer transaction pooling. Apply statement timeouts and separate connection pools for APIs, workers and analytics.
+7.4 Data ownership and consistency
+Source-of-truth ERP records retain source_system, source_key, source_version and last_synced_at.
+Core services never overwrite authoritative ERP facts unless a configured write-back workflow is approved.
+Search and reporting stores are rebuildable projections fed by domain events.
+Delete/rectification workflows publish events so search, vectors, caches, object metadata and analytics are updated consistently.
+8. Flow design
+8.1 Authentication and authorized core request
+User -> Gateway -> Identity verification -> Authorization decision
+-> Target core service -> PostgreSQL transaction
+-> Outbox event -> Kafka -> projections/notifications/audit
+<- response with request_id and version
+8.2 ERP synchronization
+Scheduler/Webhook -> Integration Service -> staging validation
+-> identity mapping -> canonical transformation -> service API/import command
+-> transaction + outbox -> Kafka -> search/reporting projections
+-> reconciliation totals -> connector health dashboard
+-> retry or dead-letter queue on failure
+8.3 AI answer with retrieval
+User -> Gateway -> AI Gateway -> Agent Orchestrator
+-> Core Authorization API
+-> Retrieval Service (tenant + scope + effective-date filter)
+-> Rule/Core read APIs for authoritative facts
+-> LLM generation with citations
+-> output validation and policy filter
+-> streamed response + immutable AI decision audit
+8.4 AI-assisted action
+Recommendation -> autonomy policy -> prepare action
+-> show evidence, impact and confirmation requirement
+-> user confirms / approver approves
+-> Orchestrator calls approved Core API with idempotency key
+-> Core service validates again and commits
+-> result validation -> audit -> intervention outcome tracking
+8.5 Student-risk batch scoring
+Scheduled Temporal workflow -> snapshot time-valid features
+-> Risk Scoring Service -> prediction + reason codes
+-> threshold and suppression rules -> create/update intervention case
+-> assign owner and SLA -> notify staff
+-> capture action and outcome -> monitoring/evaluation dataset
+No LLM directly mutates databases. All actions go through ordinary core APIs, which repeat authorization, validation, idempotency and audit checks.
+9. Capacity and performance design for 100,000 users
+9.1 Workload assumptions
+100,000 registered users across multiple tenants; 10,000 daily active users.
+2,000 peak concurrent sessions; 500 sustained and 1,500 burst API requests/second.
+Read-heavy profile of approximately 80% reads and 20% writes.
+AI usage limited by role and budget: initially 20-50 concurrent generations, with retrieval traffic higher than generation traffic.
+Seasonal spikes during admissions, results, attendance windows and fee deadlines require pre-scaling and queue protection.
+9.2 Scaling controls
+CDN caches static assets; gateway applies per-user, per-tenant and per-route rate limits.
+Stateless API replicas autoscale on concurrency, p95 latency and CPU, not CPU alone.
+Redis caches stable reference data and short-lived read models with event-driven invalidation.
+PostgreSQL primary handles writes; read replicas serve safe read models. Slow dashboards are precomputed asynchronously.
+Kafka partitions use tenant or aggregate keys to preserve ordering while allowing parallel consumers.
+OpenSearch indexes are tenant-filtered and sharded by measured index size; avoid one index per small tenant.
+AI requests use queues, concurrency limits, streaming responses, token budgets and circuit breakers. When AI is degraded, core workflows display a clear unavailable state instead of timing out.
+9.3 Performance validation
+Use k6 or Locust for API tests, OpenSearch Benchmark for search, pgbench/custom scenarios for PostgreSQL and end-to-end admission/result-day simulations.
+Test steady state, burst, dependency slowdown, broker backlog, replica loss, GPU saturation and self-hosted inference-node failure.
+Production sizing is approved only after measured p50/p95/p99 latency, saturation, error rate and cost per transaction are available.
+10. Security and tenant isolation
+Use OIDC/OAuth 2.1 federation, short-lived access tokens, refresh-token rotation and MFA for privileged roles.
+Authorization combines RBAC, organizational scope, student/guardian relationship, purpose and delegated authority.
+Encrypt data in transit and at rest; use separate keys or key contexts for sensitive tenants where required.
+Mask sensitive fields in logs, traces, support tools and model context. Include only the minimum authorized personal data required for the use case, even though inference is self-hosted.
+Apply WAF, input validation, malware scanning, egress allowlists, SSRF controls and prompt-injection defenses.
+Store audit events append-only and export them to tamper-resistant storage.
+Run dependency, container, IaC and secret scans in CI; generate an SBOM and sign production images.
+Perform threat modeling and tenant-escape testing before every major authorization or connector change.
+11. Reliability and operations
+Core service readiness checks include required database and broker dependencies; liveness checks detect dead processes without causing restart loops.
+Use timeouts, bounded retries with jitter, circuit breakers and bulkheads. Never retry a non-idempotent action without an idempotency key.
+Define RPO/RTO per data class. Test PostgreSQL PITR, object restoration and search-index rebuilds.
+Use blue/green or canary deployment for core APIs and model/prompt releases. Database migrations are backward compatible during rollout.
+Maintain runbooks for ERP connector failure, GPU or model-serving outage, search degradation, queue backlog, tenant incident and data correction.
+Key dashboards: golden signals, tenant traffic, connector freshness, database saturation, Kafka lag, workflow backlog, retrieval quality, GPU utilization, queue depth, tokens per second and AI infrastructure cost.
+12. Implementation sequence
+Phase 1 - Repository and platform foundation: monorepo, CI/CD, service template, identity, gateway, observability and local Compose profiles.
+Phase 2 - Canonical data and integration: organization, academic profile, first ERP connector, mapping, reconciliation and outbox events.
+Phase 3 - Core intervention workflow: case service, notifications, audit and reporting read model.
+Phase 4 - Self-hosted knowledge and AI foundation: licence-approved model manifests, vLLM inference, self-hosted embeddings, document ingestion, hybrid retrieval, AI gateway, citations and evaluation harness.
+Phase 5 - Retention intelligence: time-valid features, interpretable baseline model, reason codes and human review.
+Phase 6 - Pilot hardening: load tests, tenant security tests, backups, runbooks, shadow mode and SLO acceptance.
+Phase 7 - Production scaling: Kubernetes multi-node deployment, database replicas, OpenSearch cluster, broker HA and progressive rollout.
+Phase 8 - Additional use cases: admissions intelligence, compliance evidence and selective ERP module replacement.
+13. Decisions deliberately deferred
+Dedicated vector database: defer until pgvector/OpenSearch cannot meet measured recall, latency or operating-cost targets.
+ClickHouse: defer until analytics volume or latency justifies a separate analytical store.
+Native mobile apps: defer until PWA analytics reveal a device-specific requirement.
+Training a foundation model from scratch: do not include in the initial roadmap. Use a licence-approved open-weight model, RAG and optional LoRA/QLoRA adapters; reconsider pretraining only if future evidence establishes a unique data and economic advantage.
+Service mesh: defer until service count and traffic-policy complexity justify the operational cost.
+Cross-region active-active: defer until contractual availability and data-residency requirements are known.
+14. Final recommendation
+Build the backend and AI services in Python, but use TypeScript/Next.js for the user-facing portal. Keep Core and AI as separately deployable planes in one monorepo. Start on one machine only for development and pilot validation, with strict container isolation. Design every service as horizontally scalable from day one, and move production to a multi-node Kubernetes environment before claiming support for 100,000 users.
+The fastest retrieval architecture is not one database for everything. Use PostgreSQL for correctness, Redis for hot data, OpenSearch for full-text and hybrid discovery, pgvector for controlled semantic retrieval, Kafka for asynchronous propagation and precomputed read models for dashboards. Add specialized stores only when measured workloads prove the need.
+15. Primary technical references
+Python 3.14 documentation: https://docs.python.org/3.14/
+FastAPI deployment guidance: https://fastapi.tiangolo.com/deployment/
+PostgreSQL 18 documentation: https://www.postgresql.org/docs/current/
+Redis documentation: https://redis.io/docs/latest/
+pgvector indexing and scaling guidance: https://github.com/pgvector/pgvector
+Next.js 16.2 release information: https://nextjs.org/blog
+Node.js release policy and LTS status: https://nodejs.org/en/about/previous-releases
+OpenSearch releases: https://opensearch.org/releases/
+Kubernetes supported releases: https://kubernetes.io/releases/
+Docker Compose profiles: https://docs.docker.com/compose/how-tos/profiles/
+HLD & Business Flows
+HLD and Business Flow Design
+High-level architecture, stakeholder journeys and system boundaries
+1. How to read this design
+The HLD shows the system’s major actors, deployable planes, data boundaries and integration direction. It answers what the platform contains, who interacts with it and how the major parts depend on each other. The LLD tab separately explains service-level sequences, database ownership, states, retries and approval behavior.
+2. Non-technical stakeholder flow
+This business flow is intended for owners, principals, deans, teachers and implementation teams. It explains how the product converts fragmented institutional signals into coordinated human intervention.
+Observe institutional signals
+(attendance • grades • fees • wellbeing • library)
+↓
+Detect risk, opportunity or service need
+↓
+Explain evidence and recommend next-best action
+↓
+Human reviews, assigns owner and approves action
+↓
+Student / parent / teacher engagement
+↓
+Measure outcome, learn and improve policy
+↺
+Figure H1. Institutional success flow from observation to measured outcome.
+3. System context
+The Education Success OS sits between institutional users and existing systems. Existing ERP/LMS products remain authoritative during the integration-first stage; the new platform provides intelligence, coordination and outcome tracking.
+Students • Parents • Teachers • Counsellors • Librarians
+Principals / Deans • Owners • Administrators
+↓
+Web and mobile portal
+↓
+API gateway + identity
+↙           ↘
+Core platform     AI platform
+↘           ↙
+Governed data and events
+↑
+Existing ERP • SIS • LMS • Library • Payments • Messaging
+Figure H2. System context and external actors.
+4. Independently deployable Core and AI planes
+Core Platform and AI Platform share contracts and a monorepo, but they run as separate deployments. The AI plane includes self-hosted embeddings, retrieval, model routing and vLLM GPU inference. It can fail, restart or scale without interrupting identity, synchronization, workflows, cases or audit operations.
+CORE PLATFORM — independent deployment
+Gateway | Identity | Tenant | Integration | Student | Academic
+Attendance | Assessment | Workflow | Intervention | Library | Audit
+│ APIs + versioned events
+▼
+AI PLATFORM — independent deployment
+AI Gateway | Retrieval | Risk Scoring | Recommendations | Model Router
+Agent Orchestrator | Guardrails | Evaluation | Model Registry | vLLM GPU Inference
+Shared infrastructure: PostgreSQL • Redis • Event Bus • OpenSearch
+Separate health checks, scaling, release pipelines and rollback.
+Figure H3. High-level service and deployment planes.
+5. Technical data movement
+ERP and LMS data enters through controlled connectors, is validated and mapped into canonical domain commands, then produces durable events. Search, reporting and AI feature stores are rebuildable projections rather than alternate systems of record.
+ERP / LMS / SIS / Library / Finance
+↓
+Connector adapters → Validation → Canonical commands
+↓
+Core domain services
+↓
+PostgreSQL + Outbox
+↓
+Event bus / asynchronous workers
+↙             ↓              ↘
+OpenSearch       Reporting store     AI features
+↘             ↓              ↙
+Dashboards • alerts • decisions
+Figure H4. Technical data flow from source systems to decisions.
+6. HLD boundary decisions
+The web portal calls services only through the API gateway.
+AI services access core information only through authorized APIs and event feeds, never by reading core databases directly.
+Each core domain service owns its writes and publishes domain events with the outbox pattern.
+PostgreSQL is authoritative for transactions; Redis, OpenSearch, vectors and reporting stores are reconstructable acceleration layers.
+A single server is acceptable for development and pilot deployment. Production support for 100,000 registered users requires multiple application nodes and replicated stateful services.
+LLD Technical Flows
+LLD Technical Flow Design
+Service sequences, state transitions, database ownership and operational behavior
+1. Database ownership
+Each service owns a database or PostgreSQL schema. Cross-service SQL joins are prohibited. Synchronous APIs and durable domain events are the supported boundaries; search, reporting and AI stores consume authorized projections.
+Identity Service ───────→ identity_schema
+Student Service ────────→ student_schema
+Academic Service ───────→ academic_schema
+Workflow Service ───────→ workflow_schema
+Intervention Service ───→ intervention_schema
+Library Service ────────→ library_schema
+Integration Service ────→ integration_schema
+Audit Service ──────────→ immutable_audit_schema
+Owned writes → Outbox → Event Bus → Search / Reporting / AI projections
+Rule: no service reads or writes another service’s schema directly.
+Figure L1. Database ownership and read-model boundaries.
+2. Grounded AI answer sequence
+The orchestrator verifies identity and scope, retrieves authorized evidence, obtains authoritative facts from Core APIs and only then invokes the self-hosted model through the Model Router and vLLM inference service. The final answer is validated, cited and audited.
+User → AI Gateway: question + session token
+AI Gateway → Identity/Policy: authenticate, tenant and scope
+AI Gateway → Orchestrator: normalized intent
+Orchestrator → Retrieval: tenant-filtered semantic search
+Orchestrator → Core APIs: current authoritative facts
+Orchestrator → Guardrails: redact and validate context
+Orchestrator → Model Router → vLLM GPU Inference: prompt + evidence + policy
+Self-hosted model → Guardrails: draft answer
+Guardrails → User: validated answer + citations
+Orchestrator → Audit: sources, versions, latency and result
+Figure L2. Detailed sequence for an AI answer with citations.
+3. AI-assisted approved action sequence
+The model cannot write to a database. It prepares a proposed action, shows evidence, obtains confirmation or approval, and calls an approved Core API. The Core service repeats authorization and validation before committing.
+User → AI Gateway: request an action
+AI Gateway → Orchestrator: identity + tenant + intent
+Orchestrator → Retrieval/Core APIs: obtain authorized evidence
+Orchestrator → Model Router → self-hosted vLLM model: draft proposed action; no write access
+Model → User: proposal + evidence + expected impact
+User/Approver → Orchestrator: confirm or reject
+Orchestrator → Core API: signed command + idempotency key
+Core API → Policy Engine: re-authorize and validate
+Core API → PostgreSQL/Outbox: atomic commit + domain event
+Audit Service ← all steps, tool calls and outcome
+Figure L3. Detailed sequence for a confirmed AI-assisted action.
+4. Intervention case state model
+Risks are operational only when they become owned cases. The state model supports review, assignment, SLA escalation, evidence collection, outcome measurement and cancellation with a recorded reason.
+DETECTED → TRIAGED → ASSIGNED → IN PROGRESS → RESOLVED → CLOSED
+│           │          │             │              │
+│           │          └─ SLA timer ─┴─ escalation ─┘
+│           └─ reject / false positive → CANCELLED
+└─ duplicate → link to existing case
+Reopen: RESOLVED or CLOSED → ASSIGNED
+Every transition records actor, time, reason, evidence and tenant.
+Figure L4. Intervention state transitions and exception paths.
+5. Service-level contracts
+Every command includes tenant_id, actor_id, request_id and idempotency_key.
+Every event includes event_id, event_type, aggregate_id, tenant_id, occurred_at, schema_version and trace_id.
+Every AI decision records retrieved sources, policy version, model and prompt version, tool calls, confirmation and final result.
+Authorization is evaluated again inside the target Core service; gateway authorization alone is insufficient.
+Consumers persist processed event IDs so replay does not create duplicate state.
+6. Failure and recovery behavior
+Transient dependency failures use bounded retry with exponential backoff and jitter.
+Permanent validation failures return structured error codes and are not retried automatically.
+Failed integration events move to a dead-letter queue and appear in reconciliation reports.
+If the Model Router, vLLM server, embedding service or GPU node is unavailable, Core Platform workflows remain usable and show a clear degraded-state message. Requests already queued receive a bounded retry or explicit failure; they never block Core threads.
+Search and reporting indexes can be rebuilt from domain events without modifying source records.
+Non-idempotent external actions require an idempotency key and stored provider response before retry.
+ERP Migration & Integration Plan
+ERP Migration & Integration Plan
+Risk-complete playbook for cloud, on-premises, hybrid and file-based institutional systems
+1. Purpose and recommended strategy
+Use integration first, coexistence second and selective ERP replacement only after institutional approval. During discovery and pilot, the existing ERP remains authoritative. Education Success OS initially provides unified workflows, interventions, analytics and AI assistance. Record ownership moves only after reconciliation, acceptance and a signed cutover decision.
+Guiding controls
+No production cutover without a rehearsed rollback.
+No direct AI write access to source or canonical databases.
+No cross-tenant data movement.
+No assumption that institutions using the same ERP share the same schema.
+No silent data correction; every transformation is traceable.
+No inbound firewall exposure for an on-premises connector by default.
+No source retirement until retention, audit and legal obligations are satisfied.
+2. Deployment and migration decision tree
+If the ERP is SaaS with stable APIs, use API-based incremental synchronization and vendor webhooks.
+If the ERP is SaaS with weak or rate-limited APIs, combine scheduled exports, incremental calls and reconciliation.
+If the ERP runs locally, install a read-limited Institution Connector Agent inside the network. It initiates outbound encrypted connections and buffers data during outages.
+If cloud transfer is prohibited, deploy Core and approved AI services on premises, or synchronize only de-identified projections.
+If the institution keeps its ERP, use permanent coexistence and position Education Success OS as the intelligence and orchestration layer.
+If the institution replaces its ERP, cut over by domain: identity and reference data, academics, attendance, assessment, fees, library and remaining modules.
+If no database or API is accessible, ingest controlled CSV, Excel, XML or JSON exports through secure SFTP or a watched folder.
+If records are partly paper-based, use controlled digitization with dual verification and exception queues.
+3. Target integration architecture
+Local or cloud systems feed source-specific adapters. Adapters send records through mapping and validation to canonical education commands. Domain services validate ownership and rules, write to their PostgreSQL schemas and publish durable outbox events. Search, reporting and AI stores are rebuildable projections.
+Local ERP / database / export folder
+→ Institution Connector Agent
+→ encrypted outbound channel
+→ Integration Gateway
+→ staging and malware scan
+→ schema mapping and validation
+→ canonical commands
+→ domain services and reconciliation
+Connector controls
+Use least-privilege, preferably read-only source accounts.
+Store credentials in an operating-system or enterprise secrets vault.
+Use mutual TLS, tenant-bound certificates and certificate rotation.
+Persist checkpoints so synchronization resumes without duplication.
+Encrypt the bounded local buffer and enforce retention limits.
+Sign connector packages and support controlled update and rollback.
+Monitor health, last sync, lag, rejected records and disk capacity.
+Support an offline export package where continuous connectivity is forbidden.
+4. Canonical education data model
+Adapters understand individual ERP formats; Core services understand only the canonical model. Core entities include institution, campus, department, academic period, programme, course, section, student, guardian, employee, role, enrolment, timetable, attendance, assessment, grade, fee, payment, scholarship, library item, member, loan, reservation, fine, consent and intervention case.
+Every canonical record carries tenant_id, source_system, source_record_id, source_version, effective_time, ingestion_time, correlation_id and data_classification. Sensitive attributes are classified and minimized.
+Mappings are versioned per institution. Value translations, dates, timezones, currencies, code lists, defaults and calculations are testable configuration rather than hard-coded domain logic.
+5. Migration phases and gates
+Phase 0 — Sponsorship and scope
+Confirm sponsor, owners, modules, campuses, regulations, success measures, downtime and decision authority.
+Gate: signed scope and ownership matrix.
+Phase 1 — Technical and data discovery
+Inventory servers, operating systems, database engines and versions, network zones, modules, customizations, APIs, integrations, jobs, files, volumes, growth, peaks and retention.
+Gate: approved source inventory, classification and connectivity decision.
+Phase 2 — Data assessment
+Measure completeness, uniqueness, validity, integrity, orphans, duplicates, encoding, dates and inconsistent codes. Identify the authoritative source for duplicated fields.
+Gate: quality baseline and remediation owners.
+Phase 3 — Mapping and connector design
+Define source-to-canonical mapping, identity matching, deletion semantics, frequency and conflicts. Build adapter configuration and contract tests.
+Gate: business and technical owner approval.
+Phase 4 — Secure infrastructure
+Install connector, secrets, certificates, firewall rules, monitoring and secure staging. Test connectivity, throughput and recovery.
+Gate: security and infrastructure approval.
+Phase 5 — Historical trial
+Load a representative slice into non-production. Compare counts, financial totals, attendance, grades, library balances and sampled fields.
+Gate: thresholds achieved and defects assigned.
+Phase 6 — Incremental pilot
+Test change capture, timestamp deltas, webhooks or scheduled extracts. Verify checkpoints, duplicate suppression, deletes, late and out-of-order events.
+Gate: lag, accuracy and recovery targets achieved.
+Phase 7 — Acceptance and rehearsal
+Test institutional journeys with administrators, teachers, finance, librarians, students and parents. Rehearse support, restore, cutover and rollback.
+Gate: business and operations sign-off.
+Phase 8 — Production cutover
+Freeze only required functions, run final delta, reconcile, enable approved target writes and monitor critical journeys through a command centre.
+Gate: stabilization metrics met.
+Phase 9 — Hypercare
+Monitor defects, lag, queues, data quality, performance, adoption and support load. Resolve mapping exceptions before expansion.
+Gate: steady-state service levels met.
+Phase 10 — Selective decommissioning
+Retire modules only after retention export, audit validation, dependency review, backup proof and written approval. Keep read-only archives when required.
+Gate: decommission certificate and recovery evidence.
+6. Database and format variations
+Different database engine
+Problem: SQL Server, Oracle, PostgreSQL, MySQL, MariaDB, MongoDB, proprietary stores or desktop databases.
+Solution: engine-specific adapters behind one connector interface. Prefer vendor APIs; otherwise use supported drivers and read-only views. Normalize before domain services.
+Fallback: signed scheduled exports with checksums and reconciliation.
+Customized or unknown schema
+Problem: custom tables, renamed columns and institution-specific modules.
+Solution: schema discovery, representative profiling and owner-led mapping. Store mappings per tenant and version. Never infer meaning only from a column name.
+Fallback: vendor-supported views or reports.
+Legacy database version
+Problem: unsupported drivers, encryption or change capture.
+Solution: a compatible read-only connector runtime near the source transfers normalized encrypted batches to the modern gateway.
+Fallback: periodic export and reconciliation.
+Different encoding or language
+Problem: legacy encodings and multiple scripts.
+Solution: detect encoding, normalize Unicode carefully, retain original values for audit and test multilingual round-trips.
+Fallback: quarantine unconvertible values; never replace silently.
+Dates, timezones and calendars
+Problem: ambiguous dates, local time, UTC, daylight-saving changes and custom academic periods.
+Solution: retain source value; store effective time with timezone and explicit parsing/calendar rules.
+Fallback: reject ambiguous records instead of guessing.
+Different identifiers
+Problem: admission number, roll number, email, government ID and historical IDs may refer to one person.
+Solution: tenant-scoped master identity with source aliases, deterministic rules and scored human review.
+Fallback: provisional identity and merge-review queue.
+7. Synchronization and coexistence exceptions
+No change-data capture
+Use updated timestamps, increasing keys, audit tables or snapshot comparison. Store watermarks with overlap windows.
+Unreliable timestamps
+Use row hashes and snapshot differencing with source-version evidence.
+API rate limits
+Throttle, batch, back off with jitter and prioritize critical domains. Monitor quota and catch-up time.
+Internet outage
+Buffer encrypted bounded batches locally and resume from the last acknowledged checkpoint. Local ERP operations continue.
+Source unavailable
+Pause without advancing the checkpoint. Preserve the last consistent state and reconcile the missing interval after recovery.
+Duplicate or replayed records
+Use idempotency keys based on tenant, source, entity and version. Consumers persist processed event IDs.
+Late or out-of-order records
+Compare source version and effective time. Reject stale destructive changes or apply the domain conflict policy.
+Deleted source record
+Define per-entity behavior: soft delete, deactivate, anonymize, retain or ignore. Financial, academic and audit records normally require retention.
+Two systems update the same field
+Maintain a field-level authority matrix. Only the authoritative system writes; conflicts enter review.
+Circular synchronization
+Tag origin and correlation ID. Do not export a change back to its origin unless the contract requires acknowledgement.
+8. Data quality and reconciliation
+Validate files, batches, records and fields. Quarantine invalid records without blocking valid records unless atomic consistency is required.
+Reconcile using counts, distinct IDs, financial sums, attendance totals, grade distributions, library items and balances, plus sampled field comparisons. Reports separate expected transformations from defects.
+Financial balances normally require exact reconciliation. Identity, enrolment and current academic data require near-complete reconciliation with every exception explained. Historical optional data may use an approved tolerance.
+Exception flow
+Detected → classified → assigned → corrected at source or mapping → replayed → reconciled → closed.
+Every override records actor, reason, evidence and approval.
+9. Security, privacy and compliance
+Excessive source access
+Use least-privilege accounts, read-only views and field allowlists. Log connector queries and administration.
+Unnecessary sensitive data
+Minimize at extraction. Mask, tokenize or exclude health, disability, financial and government identifiers unless approved use requires them.
+Credential compromise
+Use short-lived credentials where possible, vault storage, rotation, tenant-bound certificates and immediate revocation. Never store secrets in mapping files or logs.
+Data residency restriction
+Use an approved region, on-premises deployment or approved projections. Record where backups, logs, vectors and model requests are processed.
+Consent and purpose limitation
+Migrate consent and preferences. Enforce tenant, purpose and role authorization at retrieval and action time.
+Correction or deletion request
+Use authoritative correction workflows, apply retention holds and retain non-personal audit proof where permitted.
+Self-hosted AI deployment and data residency
+Use a self-hosted model gateway with tenant policy, egress deny-by-default controls, private model endpoints, licence-approved open-weight models and redaction. Do not send model requests to externally billed AI APIs in normal operation, and do not train a shared model on tenant data by default.
+Audit gap
+Record extraction, transformation, approval, AI evidence, model/prompt version, tool calls, target result and reconciliation.
+10. Performance and scale risks
+Large historical volume
+Partition by campus, academic period and domain; use resumable batches and controlled parallelism.
+Peak impact on the ERP
+Throttle reads, use replicas or reporting views and avoid admission, attendance and examination peaks.
+Slow queries
+Select required columns, use indexed watermarks and paginated reads. Obtain DBA approval before adding source indexes.
+Backlog after outage
+Prioritize critical domains, control catch-up rate and shed nonessential projections. Publish recovery estimates.
+One lakh registered users
+Capacity-test concurrent active users. Scale stateless services horizontally; use pooling, Redis, PostgreSQL replicas, OpenSearch, queue backpressure and independent AI workers.
+AI latency or outage
+Keep Core workflows available. Use timeouts, circuit breakers and clear degraded-state messaging. Never block attendance, fees, library or emergency communication on AI.
+11. Testing strategy
+Contract tests cover adapter and canonical schema versions.
+Transformation tests cover nulls, codes, dates, multilingual text, large values and duplicate IDs.
+Integration tests cover authentication, retries, checkpoints, event replay, dead-letter queues and authorization.
+Reconciliation tests compare control totals and sampled records.
+Security tests cover secrets, certificates, tenant isolation, log redaction and vulnerabilities.
+Performance tests cover peak reads, bulk loads, backlog recovery, portal concurrency and AI isolation.
+Resilience tests interrupt databases, networks, queues, storage, GPU inference nodes, model-serving containers and connectors.
+User tests cover admissions, enrolment, timetable, attendance, assessment, fees, library, communication, intervention and reporting.
+Rollback rehearsals prove return to the last stable mode.
+12. Cutover models
+Parallel run
+Both systems operate temporarily; recommended for high-risk domains. Define one authoritative writer.
+Phased domain cutover
+Move modules separately and avoid attendance or assessment ownership changes during examinations.
+Campus-by-campus
+Useful for operationally independent campuses. Prevent reports from mixing partially migrated semantics.
+Big bang
+Use only for small, simple systems with proven rollback and explicit leadership acceptance.
+Read-only intelligence launch
+Lowest-risk start: synchronize data and enable dashboards/interventions while operational writes remain in the ERP.
+13. Go/no-go and rollback
+Proceed only when backups are verified, final delta completes, reconciliation passes, critical journeys pass, support and monitoring are active, decision makers are available, rollback is achievable, security approval is current and open defects are within approved limits.
+Stop or roll back when financial totals differ unexplained, tenant isolation is uncertain, current identity/enrolment integrity fails, critical integrations are unavailable, source recovery is uncertain, severe performance degradation occurs, auditing is incomplete or the rollback window is at risk.
+Rollback is domain-specific: disable target writes, preserve evidence, stop outbound sync, restore the previous authority matrix and replay only verified source changes. Do not automatically reverse financial or externally communicated actions without approval.
+Maintain the cutover checkpoint, immutable manifest, mapping versions, batch hashes, backups, pending-message inventory and external-action list. After rollback, reconcile both systems and schedule a new rehearsal.
+14. Vendor and organizational risks
+Vendor refuses database access
+Use licensed APIs, reporting views or exports. Include vendor lead time. Never bypass licensing or security.
+Vendor changes API or schema
+Version adapters and mappings, detect schema drift, run compatibility tests and temporarily support parallel versions.
+No documentation
+Combine profiling, interviews and observed reports. Require owner approval for uncertain mappings.
+Key employee unavailable
+Document credentials, customizations, mappings and runbooks; assign primary and backup owners.
+Process changes mid-migration
+Freeze critical decisions per release. Route new requirements through change control and regression testing.
+Low user adoption
+Provide role-based training, champions, sandbox practice, contextual help and adoption monitoring.
+Conflicting definitions
+Create a glossary and authority matrix for active student, attendance, outstanding fee and completion before reporting.
+Budget or schedule pressure
+Protect security, reconciliation and rollback gates. Reduce scope or historical depth instead of skipping controls.
+15. AI-specific risks
+Poor history may create misleading risk scores. Start with descriptive insights, evaluate subgroup performance and require human review before automation.
+Documents may contain prompt injection, obsolete policy or unauthorized data. Apply authorization, scanning, metadata filters, citations and tool guardrails.
+Model behavior can change. Version models, prompts, retrieval configuration and evaluation datasets; regress before promotion.
+Do not train a general shared model on institutional data by default. Begin with retrieval-augmented generation, rules and conventional predictive models only for validated use cases. Training requires explicit purpose, lawful basis, representative data, de-identification where possible, evaluation, approval and monitoring.
+16. Post-migration operating model
+Integration operations own connector health, lag, rejected records, certificates, queues and vendor changes.
+Data stewards own definitions, mappings, quality exceptions and reconciliation.
+Security owns access reviews, incidents, secrets, residency and audit.
+Domain owners approve authority changes and cutovers.
+Platform operations own releases, backups, capacity, observability and disaster recovery.
+AI governance owns approved use cases, evaluations, model changes and human-approval policy.
+Define service objectives for connector availability, synchronization lag, record freshness, reconciliation completion, incident response, recovery time and recovery point per institution and domain.
+17. Required migration deliverables
+Approved scope and stakeholder matrix.
+Source, interface and dependency inventory.
+Data classification and residency assessment.
+Source-to-canonical mapping specification.
+Field-level authority and conflict matrix.
+Connector installation and security runbook.
+Data-quality baseline and remediation plan.
+Test evidence and defect register.
+Reconciliation reports and approval record.
+Cutover, communication and go/no-go plan.
+Rollback plan and rehearsal evidence.
+Hypercare dashboard and escalation matrix.
+Retention, archive and decommission plan.
+Post-migration review and lessons learned.
+18. Final acceptance criteria
+Migration completes only when all in-scope data has an authoritative owner; reconciliation meets approved thresholds; exceptions have owners and deadlines; critical journeys pass; tenant and role authorization are verified; audit evidence is complete; backup and recovery pass; monitoring and support operate; users are trained; and the institution signs stabilization or decommissioning.
+Commercial recommendation
+Sell Education Success OS as integration-first. Institutions retain their ERP, adopt intelligence and workflow modules first, and replace individual ERP functions only after value, readiness and operational safety are proven.
+Development System Design
+Development System Design
+Build-ready technical specification for the first production-capable release
+1. Development objective and MVP boundary
+Build an integration-first Education Success OS that operates over existing school, college and university ERPs. The first release must prove secure tenant isolation, canonical data ingestion, role-based portal access, student success workflows, library visibility, notifications, reporting and grounded AI assistance without requiring the institution to replace its ERP.
+MVP outcomes
+An institution can create a tenant, campuses, roles and scoped users.
+An administrator can connect one ERP through API, database or controlled file import.
+Students, guardians, employees, courses, sections and enrolments synchronize into canonical records.
+Teachers and authorized staff can view permitted student context and create intervention cases.
+Cases have owners, status, tasks, evidence, SLAs, escalation and outcomes.
+Library items, members, loans, reservations and fines can synchronize or operate natively.
+Students and parents receive role-appropriate portal views and approved notifications.
+Policies and institutional documents can be searched and used by a citation-producing AI assistant.
+AI failure does not interrupt any core transaction.
+All administrative, integration and AI decisions are auditable.
+Not in the first release
+Full ERP replacement, payroll, advanced accounting, hostel and transport operations, native mobile applications, autonomous AI actions, custom deep-learning models, a dedicated vector database and cross-region active-active deployment are deferred unless a signed pilot requires them.
+2. Runtime architecture
+The repository contains two independently deployed planes.
+Core Platform
+Web portal, API gateway, identity, tenant and authorization, canonical academic data, integration, workflow and intervention, library, notification, document metadata, reporting and audit.
+AI Platform
+AI gateway, document ingestion, retrieval, agent orchestration, guardrails, evaluation, risk scoring and recommendation services.
+Shared infrastructure
+PostgreSQL, Redis, Kafka-compatible event streaming, Temporal, OpenSearch, S3-compatible object storage, OpenTelemetry collection, Prometheus and Grafana.
+Dependency rule
+The portal calls only the API gateway. Core services own transactional data. AI services access approved Core APIs and authorized event projections; they never read or write Core schemas directly. Every mutating AI-assisted action requires an approved Core API and repeats authorization, validation, idempotency and audit checks.
+3. Practical deployable units
+Keep logical domains independent in code and data ownership. For the first pilot, reduce operational overhead by deploying related logical services together where appropriate, without sharing domain tables or internal business logic.
+Pilot deployables
+web: Next.js portal and PWA shell.
+gateway: routing, authentication integration, rate limiting and request correlation.
+core-api: identity, tenant, authorization, academic profile, library, workflow, notification configuration, document metadata and audit APIs as independently structured domain packages.
+core-workers: outbox relay, notifications, scheduled read-model jobs and Temporal activities.
+integration-api: connector registration, mappings, sync jobs, reconciliation and connector health.
+integration-workers: extraction, validation, canonical transformation and replay.
+ai-gateway: AI policy, sessions, request budgets, streaming and audit coordination.
+ai-workers: ingestion, evaluation, scoring and recommendations. ai-inference: self-hosted embedding, optional reranker, model router and vLLM GPU inference, deployed and scaled independently from Core.
+Split trigger
+A logical service receives its own deployment when it needs independent scaling, release cadence, fault isolation, ownership or security policy. Contracts and database ownership must allow the split without changing clients.
+4. Technology baseline
+Backend and AI use Python, FastAPI, Pydantic, SQLAlchemy, psycopg and Alembic. The portal uses TypeScript, Next.js and React. Use generated TypeScript clients from versioned OpenAPI specifications.
+Use PostgreSQL for transactions and initial vector retrieval through pgvector; Redis for reconstructable cache, locks and rate limits; Kafka for durable events; Temporal for long-running workflows; OpenSearch for authorized full-text and hybrid search; and S3-compatible object storage for documents and artifacts.
+Use uv workspaces for Python and pnpm workspaces with Turborepo for TypeScript. Pin exact versions in lock files and container images during repository bootstrap. Upgrade through automated compatibility tests, not floating production tags.
+5. Monorepo structure
+education-success-os/
+apps/
+web/
+services/
+gateway/
+core_api/
+core_workers/
+integration_api/
+integration_workers/
+ai_gateway/
+ai_workers/
+domains/
+identity/
+tenancy/
+authorization/
+academic_profile/
+attendance_assessment/
+library/
+intervention/
+notification/
+documents/
+audit/
+reporting/
+integration/
+ai_retrieval/
+risk_scoring/
+packages/
+python/contracts/
+python/authz_sdk/
+python/event_sdk/
+python/observability/
+python/testing/
+typescript/api_client/
+typescript/ui/
+typescript/auth/
+contracts/
+openapi/
+events/
+jsonschema/
+db/
+migrations/
+seeds/
+fixtures/
+deploy/
+compose/
+kubernetes/
+helm/
+terraform/
+tests/
+contract/
+integration/
+end_to_end/
+performance/
+security/
+docs/
+adr/
+runbooks/
+data_dictionary/
+Repository rules
+Domain business logic cannot depend on FastAPI, Kafka or database adapters.
+Shared packages contain contracts and infrastructure concerns, not cross-domain business rules.
+Every deployable owns its Dockerfile, health checks, configuration schema and tests.
+Every API and event change runs compatibility checks.
+No service imports another service’s persistence layer.
+6. Core domain design
+Identity and tenancy
+Owns users, federated identities, authentication methods, service accounts, sessions, token revocation, tenants, campuses and tenant configuration.
+Authorization
+Owns roles, permissions, organizational scopes, guardian-student relationships, delegations and policy decisions. Initial implementation uses application-level policy evaluation with tenant-scoped PostgreSQL records. Introduce a dedicated policy engine only when policy complexity requires it.
+Academic profile
+Owns canonical people, guardians, staff, programmes, courses, sections, academic periods and enrolments. ERP-owned facts retain source system, source key, source version and synchronization time.
+Attendance and assessment
+Owns normalized attendance events, assessment definitions, results and calculated summaries when included in pilot scope. Source ownership is configurable per institution.
+Library
+Owns library locations, catalogue metadata, copies, members, loans, renewals, reservations, fines, circulation policies and provider mappings. It can operate as a read model over an existing library system or become authoritative for institutions without one.
+Intervention and workflow
+Owns cases, risk signals, assignments, tasks, approvals, SLAs, escalations, evidence, comments and outcomes. Temporal manages long waits and retries; PostgreSQL remains authoritative for case state.
+Integration
+Owns connectors, credentials references, mappings, jobs, watermarks, batches, rejected records, reconciliation and dead-letter replay. It sends canonical commands to owning services instead of writing their schemas.
+Documents and audit
+Document metadata, versions, access labels and object keys are transactional. Files remain in object storage. Audit is append-only and records actor, tenant, request, source, policy/model versions and outcome.
+Reporting
+Consumes events into role-specific read models. User requests never execute unbounded joins across transactional schemas.
+7. Database ownership and initial schemas
+Use one PostgreSQL cluster during development and pilot with a separate schema and migration history per logical service. Use a distinct database role per deployable and deny cross-schema writes.
+identity_schema
+users, user_identities, auth_methods, sessions, service_accounts, token_revocations.
+tenancy_schema
+tenants, campuses, departments, tenant_settings.
+authorization_schema
+roles, permissions, role_bindings, relationship_scopes, delegations, policy_versions.
+academic_schema
+persons, students, guardians, employees, programmes, courses, sections, academic_periods, enrolments, source_aliases.
+learning_schema
+attendance_events, attendance_summaries, assessments, assessment_results, grading_schemes.
+library_schema
+libraries, catalogue_records, item_copies, members, loans, reservations, fines, circulation_policies, provider_aliases.
+intervention_schema
+signals, cases, case_assignments, tasks, approvals, evidence_links, comments, state_history, outcomes, sla_timers.
+integration_schema
+connectors, connector_credentials_refs, mapping_sets, mapping_versions, sync_jobs, watermarks, batches, staging_records, validation_errors, reconciliation_runs, dead_letters.
+document_schema
+documents, document_versions, access_labels, source_links, retention_policies.
+audit_schema
+audit_events, security_events, ai_decisions and export_manifests with append-only permissions.
+reporting_schema
+student_success_summary, case_work_queue, connector_freshness, library_summary and leadership_metrics.
+ai_schema
+knowledge_sources, chunks, embedding_versions, retrieval_evaluations, prompt_versions, model_policies, risk_model_versions, predictions and recommendation_feedback. AI schema contains authorized projections and AI metadata, not duplicate authoritative student records.
+Required columns and indexes
+All tenant data includes tenant_id. External records include source_system, source_record_id and source_version. Commands carry idempotency_key and request_id. Events carry event_id, aggregate_id, tenant_id, occurred_at, schema_version and trace_id. High-volume indexes begin with tenant_id. Use time-ordered identifiers, statement timeouts and separate pools for APIs, workers and reporting.
+8. API contract standard
+Expose versioned REST/JSON APIs under /api/v1. Generate OpenAPI in CI and publish immutable contract artifacts.
+Request requirements
+Bearer identity or service token.
+X-Tenant-ID resolved and validated against token claims.
+X-Request-ID propagated across services.
+Idempotency-Key required for externally retried mutations.
+Optimistic version or ETag for conflict-prone updates.
+Response requirements
+Stable error envelope containing code, message, request_id, details and retryable flag.
+Pagination through opaque cursors.
+UTC timestamps with explicit offset.
+No sensitive field returned unless permission and purpose allow it.
+Initial public endpoints
+POST /api/v1/tenants
+POST /api/v1/users/invitations
+GET /api/v1/me
+GET /api/v1/students and GET /api/v1/students/{id}
+GET /api/v1/students/{id}/success-summary
+GET and POST /api/v1/interventions
+POST /api/v1/interventions/{id}/transitions
+GET /api/v1/library/items
+POST /api/v1/library/loans and POST /api/v1/library/returns
+POST /api/v1/connectors
+POST /api/v1/connectors/{id}/test
+POST /api/v1/sync-jobs and GET /api/v1/reconciliation-runs/{id}
+POST /api/v1/ai/answers with streamed output
+POST /api/v1/ai/proposed-actions and POST /api/v1/ai/proposed-actions/{id}/confirm
+9. Event contract standard
+Publish state changes through an outbox in the same transaction. Relays publish to Kafka. Consumers are idempotent and persist processed event IDs.
+Initial event families
+tenant.created, user.invited, authorization.binding_changed.
+person.upserted, enrolment.changed, attendance.recorded, assessment.result_changed.
+library.loan_created, library.item_overdue, library.fine_changed.
+intervention.case_created, intervention.case_transitioned, intervention.sla_breached.
+connector.sync_started, connector.batch_validated, connector.sync_completed, connector.sync_failed.
+document.version_published, audit.event_recorded.
+Compatibility rules
+Add optional fields without breaking existing consumers. Never reuse a field with new meaning. Breaking changes create a new event version. Contract tests verify old and new consumers during transition.
+10. Critical runtime flows
+Authenticated core request
+Portal → Gateway → identity verification → authorization decision → Core domain → PostgreSQL transaction and outbox → response. Event relay later updates reporting, search, notification and audit projections.
+Local ERP synchronization
+Scheduler or webhook → Institution Connector Agent → encrypted batch → Integration Service → staging → validation → mapping version → canonical commands → owning Core APIs → outbox events → reconciliation. Failures are quarantined or moved to dead letter without advancing the committed watermark.
+Grounded AI answer
+Portal → Gateway → AI Gateway → authorization → tenant-filtered retrieval → approved Core read APIs → guardrails → model → citation and output validation → streamed response → immutable AI audit.
+Approved AI action
+AI prepares an action with evidence and impact. A user or approver confirms. The orchestrator calls the approved Core API with an idempotency key. Core repeats authorization and validation before commit.
+11. Local-server connector design
+Ship a signed Institution Connector Agent for Windows and Linux as a container or native service. The connector opens outbound TLS only. Plugins support REST, SOAP, SQL Server, Oracle, PostgreSQL, MySQL, SFTP and signed file exports.
+Connector components
+Source adapter with a read-only account.
+Schema discovery and approved query/view configuration.
+Mapping executor using a versioned mapping set.
+Encrypted bounded spool for offline operation.
+Checkpoint and acknowledgement manager.
+Health and diagnostic exporter.
+Remote configuration verifier; secrets remain local where required.
+Signed updater with rollback.
+Safety limits
+Configurable rows, bytes, duration and concurrency per extraction.
+Read-only transactions and source query timeouts.
+No arbitrary remote SQL execution.
+Field allowlist and local masking.
+Checksum, batch signature and malware scanning for files.
+Watermark advances only after durable acknowledgement.
+12. Security model
+Use OIDC/OAuth federation and MFA for privileged users. Short-lived access tokens carry tenant, user, role and scope identifiers. Authorization combines RBAC with campus/department scope, relationship, purpose and delegation.
+Apply tenant filters in repositories and database policies for sensitive high-risk tables. Encrypt transport and storage, isolate service accounts, rotate secrets and restrict outbound destinations. Mask personal data in logs, traces, support tools and AI prompts. Scan uploads, dependencies, containers and infrastructure code. Produce SBOMs and sign production images.
+Threat-model tenant escape, broken object authorization, connector compromise, malicious files, SSRF, webhook replay, prompt injection, excessive AI tool permissions and audit tampering before pilot launch.
+13. AI implementation design
+Start with retrieval-augmented generation, deterministic rules and interpretable predictive baselines. Do not train a foundation model.
+Knowledge ingestion
+Authorized document upload → malware scan → text extraction → classification and access labels → chunking → embedding → pgvector/OpenSearch indexes → evaluation sample.
+Retrieval
+Filter by tenant, scope, document status and effective date before ranking. Combine lexical and semantic scores. Return source identifiers and quoted evidence spans to the answer pipeline.
+Risk scoring
+Create time-valid feature snapshots from authorized events. Begin with rules and a calibrated tree-based baseline. Store model version, features timestamp, score, reason codes and decision threshold. Run in shadow mode before staff see recommendations.
+Evaluation gates
+Retrieval recall and citation correctness.
+Answer groundedness, refusal and sensitive-data leakage.
+Tool authorization and confirmation behavior.
+Risk model discrimination, calibration and subgroup error analysis.
+Cost, latency and provider-failure behavior.
+14. Deployment profiles
+Developer profile
+Web, gateway, core, integration and AI containers; PostgreSQL, Redis, Kafka-compatible broker, Temporal, OpenSearch and object storage. Seed data and mock ERP adapter included.
+Pilot single-machine profile
+Separate Core and AI networks, service accounts, Compose projects, CPU/memory limits and deployment commands. Core resources are reserved before AI. Backups leave the machine. Externally billed model APIs are prohibited in the normal production path. If shared-machine inference risks Core capacity, move the self-hosted model router, embedding service and vLLM inference server to a dedicated GPU machine while preserving the internal AI contract.
+Production profile
+Kubernetes with separate Core and AI namespaces, horizontal scaling, network policies, managed or highly available PostgreSQL, Redis, broker, OpenSearch and object storage. AI workers may use separate GPU nodes. Use rolling or canary releases and backward-compatible database migrations.
+15. Observability and reliability
+Every request and event carries a trace and request identifier. Export structured logs, metrics and traces through OpenTelemetry.
+Required dashboards
+API traffic, p50/p95/p99 latency and errors.
+Authentication and authorization failures.
+Database connections, locks, replication and slow queries.
+Kafka consumer lag and dead letters.
+Temporal workflow backlog and failures.
+Connector freshness, rejected records and reconciliation status.
+Search latency and indexing lag.
+AI retrieval quality, input/output token volume, GPU utilization and memory, queue depth, tokens per second, refusal rate, inference latency and model-serving errors.
+Tenant-level usage without exposing personal data.
+Use timeouts, bounded retries with jitter, circuit breakers and bulkheads. Core remains usable when AI, search, messaging or an ERP connector is degraded. Define and test backup, restore, RPO and RTO before pilot cutover.
+16. Testing architecture
+Unit tests cover domain rules without infrastructure.
+Contract tests cover OpenAPI, events and connector adapters.
+Integration tests use disposable real dependencies where practical.
+End-to-end tests cover administrator, teacher, librarian, student and parent journeys.
+Security tests cover tenant isolation, authorization, secrets and malicious inputs.
+Migration tests cover mappings, idempotency, late events, deletion and reconciliation.
+AI evaluations run as release gates for prompts, retrieval and models.
+Performance tests cover steady, burst, backlog and dependency-degradation scenarios.
+Resilience tests interrupt databases, brokers, networks, search, GPU nodes, model routers and vLLM inference containers.
+17. Engineering definition of done
+A feature is complete only when domain rules, API/event contracts, migrations, authorization, tenant isolation, audit events, observability, tests, documentation and rollback behavior are implemented. It must pass linting, typing, unit, contract, integration, security and relevant performance checks. Database migrations must be backward compatible for rolling deployment. Every operationally significant feature includes a dashboard or runbook update.
+18. Decisions required before coding business modules
+Select the first pilot institution and its ERP integration mechanism.
+Confirm first-release domains and source-of-truth ownership.
+Choose the identity provider and notification providers.
+Agree data residency, backup location, RPO and RTO.
+Approve the first canonical data dictionary and mapping ownership.
+Confirm whether the first library implementation is synchronized or native.
+Define AI-approved use cases and prohibited data classes.
+Replace workload assumptions with pilot estimates when available.
+Development can begin immediately on repository foundation, service templates, local infrastructure, contract conventions and mock ERP fixtures while these institution-specific decisions are finalized.
+Implementation Backlog
+Implementation Backlog
+Development sequence, sprint outcomes and acceptance gates
+1. Delivery model
+Use two-week sprints, trunk-based development, short-lived branches and automated deployments to a shared development environment. The plan assumes a focused team and delivers a pilot-capable release in approximately twelve to fourteen sprints. Change scope rather than removing security, tenant isolation, reconciliation or rollback gates.
+Recommended initial team
+One technical lead or architect.
+Two to three Python backend engineers.
+One TypeScript frontend engineer.
+One integration/data engineer.
+One AI/ML engineer, joining full-time after the Core foundation.
+One QA automation engineer.
+One platform/DevOps engineer, initially shared.
+One product owner/business analyst with access to institutional subject-matter experts.
+Part-time security, data-governance and UX support.
+Delivery streams
+Platform foundation.
+Core domains and portal.
+ERP integration and data migration.
+Workflow, library and reporting.
+AI and evaluation.
+Quality, security, operations and pilot readiness.
+2. Priority rules
+P0 work blocks all dependent development or protects tenant/security/data correctness.
+P1 work is required for the first institutional pilot.
+P2 work improves usability, scale or additional use cases but can follow the pilot.
+Build vertical slices. Each sprint should finish at least one user journey from portal through API, authorization, database, audit and automated tests. Avoid building every database first and every screen later.
+3. Sprint 0 — Product and engineering inception
+Objective
+Remove decisions that would cause architectural rework and establish the working agreement.
+Backlog
+Confirm pilot institution, ERP/vendor contacts and integration method.
+Approve MVP modules and explicitly deferred modules.
+Define personas, tenant hierarchy, role hierarchy and student/guardian relationships.
+Define first ten critical user journeys and their acceptance criteria.
+Create system context, threat model and data-classification workshop outputs.
+Approve source-of-truth and field-authority matrix.
+Create canonical terminology and data-dictionary skeleton.
+Choose identity, email/SMS and object storage components. Select licence-approved open-weight generation, embedding and optional reranker models; record their licences and checksums; and select the development GPU plus vLLM serving configuration.
+Define environments, branching, release, incident and change-control process.
+Create initial architecture decision records.
+Exit gate
+Product scope, authority matrix, pilot integration path, security constraints and Definition of Done are approved. Unknowns are recorded with owners and decision deadlines.
+4. Sprint 1 — Monorepo and local platform
+Objective
+Every engineer can clone, start, test and observe the platform locally.
+Backlog
+Create uv and pnpm/Turborepo workspaces.
+Create Python service and domain-package templates.
+Create Next.js application shell and shared UI package.
+Add PostgreSQL, Redis, Kafka-compatible broker, Temporal, OpenSearch, object storage and telemetry through Compose. Add a separate self-hosted AI inference profile containing the model router, embedding service and vLLM GPU server.
+Create Core and AI Compose profiles with separate networks and resource limits.
+Create environment configuration validation and secrets placeholders.
+Add lint, formatting, typing, unit-test and build commands at the repository root.
+Add CI pipeline, dependency caching, security scanning and container builds.
+Add OpenTelemetry, structured logging, request IDs and health/readiness endpoints.
+Create seed framework and mock ERP fixtures.
+Acceptance
+A new developer starts the complete stack with one documented command.
+CI blocks formatting, type, test, contract and secret-scan failures.
+Core remains healthy when the AI profile is stopped.
+A sample request is traceable from gateway to database and back.
+5. Sprint 2 — Tenant, identity and authorization foundation
+Objective
+Create secure multi-tenant access before business data enters the system.
+Backlog
+Implement tenant, campus and department models.
+Integrate development OIDC provider and token verification.
+Implement user invitations, identity linking, session/revocation records and service accounts.
+Implement roles, permissions, campus/department scope, guardian relationship and delegation model.
+Create authorization middleware and repository tenant filters.
+Create gateway routes, rate limits and request correlation.
+Build login, tenant selection, unauthorized and profile screens.
+Add audit records for login, invitation, role and configuration actions.
+Create tenant-escape security test suite.
+Acceptance
+A user cannot query another tenant by changing URL, request body or identifier.
+Every mutation records tenant, actor and request ID.
+Role and scope changes take effect according to the documented token/cache policy.
+Privileged roles require the configured stronger authentication policy.
+6. Sprint 3 — Canonical academic model
+Objective
+Create the stable education data contracts consumed by every later module.
+Backlog
+Implement persons, students, guardians, employees, programmes, courses, sections, academic periods and enrolments.
+Implement source aliases and master-identity matching foundations.
+Create canonical import command contracts and idempotent upsert behavior.
+Create OpenAPI specifications and generated TypeScript client.
+Publish person and enrolment domain events through the outbox.
+Build administrator list/detail pages with permission-aware fields.
+Create data dictionary, validation rules and representative fixtures for school, college and university structures.
+Acceptance
+Repeated canonical commands do not duplicate records.
+Every record is tenant-scoped and retains source lineage.
+Breaking contract changes fail CI.
+School, college and university fixtures can coexist without separate code branches.
+7. Sprint 4 — Integration framework and mock connector
+Objective
+Prove the complete extraction-to-reconciliation pipeline before connecting a real ERP.
+Backlog
+Implement connector, mapping set, mapping version, job, watermark, batch and validation-error models.
+Create adapter interface for API, database and file sources.
+Build a mock ERP adapter with realistic bad and late records.
+Implement staging, schema validation, mapping execution and canonical command dispatch.
+Implement encrypted credential-reference handling.
+Implement checkpoint acknowledgement, retries, dead letters and replay.
+Create reconciliation counts and field-sample report.
+Build connector registration, test, run-history and health screens.
+Publish connector lifecycle events and dashboards.
+Acceptance
+A mock dataset synchronizes into canonical records and produces a reconciliation report.
+Invalid records are quarantined without losing valid records.
+A killed worker resumes without duplication or skipped committed data.
+No integration component writes an academic domain table directly.
+8. Sprint 5 — First real ERP connector
+Objective
+Synchronize representative pilot data safely from the institution’s environment.
+Backlog
+Complete source discovery and approved extraction design.
+Implement the required REST, database or file adapter.
+Create institution-specific versioned mapping configuration.
+Install or package the Institution Connector Agent when the ERP is local.
+Add read limits, query timeouts, local encrypted spool and health telemetry.
+Run schema-drift and mapping contract tests.
+Load a non-production historical sample.
+Resolve identity, encoding, date, timezone and code-list exceptions.
+Produce reconciliation report and remediation backlog.
+Acceptance
+Source administrators approve access and performance impact.
+Sample reconciliation meets agreed thresholds or every exception has an owner.
+Offline interruption, resume and credential rotation are demonstrated.
+The connector cannot execute unapproved arbitrary source queries.
+9. Sprint 6 — Intervention workflow vertical slice
+Objective
+Turn synchronized signals into owned, auditable human work.
+Backlog
+Implement case, assignment, task, evidence, comment, state history, outcome and SLA models.
+Implement state transitions, validation, optimistic concurrency and idempotency.
+Implement Temporal workflows for SLA timers, reminders and escalation.
+Build staff work queue, case detail, assignment and transition screens.
+Add manual case creation from a student profile.
+Create notification events and audit records.
+Create role rules for teacher, counsellor, principal/dean and administrator.
+Acceptance
+An authorized teacher creates a case, assigns it, adds evidence and resolves it.
+Unauthorized roles cannot view or modify the case.
+Duplicate transition requests do not duplicate state or notifications.
+SLA breach is detected after restart and produces an escalation event.
+10. Sprint 7 — Notification and reporting read models
+Objective
+Deliver timely communication and fast role-specific dashboards.
+Backlog
+Implement templates, preferences, channel policy, delivery attempts and receipts.
+Integrate one development email provider and a provider abstraction for SMS/other channels.
+Build event-driven student-success summary, work-queue, connector-freshness and leadership read models.
+Create teacher, principal/dean, owner and administrator dashboards.
+Implement cache rules and event-driven invalidation.
+Add digest scheduling and delivery-failure handling.
+Add accessibility, low-bandwidth and responsive portal checks.
+Acceptance
+Dashboards do not execute cross-service transactional joins on request.
+Failed messages retry safely and appear in an operations queue.
+Users receive only messages allowed by tenant policy and preferences.
+Core dashboards meet the agreed pilot latency under representative load.
+11. Sprint 8 — Library module
+Objective
+Close the identified functional gap with a module that supports synchronization or native operation.
+Backlog
+Implement libraries, catalogue records, copies, members, loans, renewals, reservations, fines and circulation policies.
+Add provider aliases and library connector mapping contracts.
+Implement item search, availability, issue, return, renew and reserve APIs.
+Build librarian circulation screens and student/parent loan views.
+Create overdue workflow and notifications.
+Publish loan, overdue and fine events to reporting and intervention rules.
+Implement conflict rules when an existing library system is authoritative.
+Acceptance
+A librarian completes issue, return, renewal and reservation journeys.
+Concurrent issue attempts cannot loan the same copy twice.
+Existing-system mode prevents unauthorized native write ownership.
+Outstanding loans and fines reconcile with the source during pilot migration.
+12. Sprint 9 — Document and knowledge foundation
+Objective
+Create an authorized institutional knowledge base before adding generative answers.
+Backlog
+Implement document metadata, versions, access labels, effective dates and retention records.
+Add upload, malware scan, object storage and text extraction pipeline.
+Implement chunking and provenance storage.
+Index authorized text in OpenSearch and embeddings in pgvector.
+Create tenant, scope, status and effective-date filters before ranking.
+Build document administration, search and access-review screens.
+Create retrieval evaluation dataset using approved pilot documents.
+Acceptance
+Users cannot retrieve chunks from unauthorized tenants or scopes.
+Every search result identifies the source document and effective version.
+Deletion or access-label changes remove or update search and vector projections.
+Retrieval evaluation has agreed baseline recall and latency measurements.
+13. Sprint 10 — Grounded AI assistant
+Objective
+Provide useful answers with citations while keeping all core functions independent.
+Backlog
+Implement AI gateway, tenant policy, quotas, sessions and streaming. Deploy the pinned open-weight model through the model router and vLLM; expose only an internal inference endpoint.
+Implement retrieval orchestration and approved Core read tools.
+Implement prompt templates, output schema validation, citation validation and refusal behavior.
+Exclude unnecessary personal data before constructing the self-hosted model context.
+Record model checksum, adapter version, prompt, retrieval sources, tool calls, latency, tokens, GPU/inference deployment and result in AI audit.
+Build portal assistant with sources, feedback and clear unavailable state.
+Create evaluation harness for groundedness, citation, leakage, injection and refusal.
+Add provider timeout, circuit breaker and fallback behavior.
+Acceptance
+Answers cite only authorized evidence supplied to the model.
+Prompt-injection test documents cannot expand tool or tenant access.
+Stopping AI leaves all Core journeys operational.
+A prompt, open-weight model, quantization, adapter, embedding model or inference configuration change cannot deploy without licence verification, checksum registration and evaluation regression results.
+14. Sprint 11 — Rules and risk scoring in shadow mode
+Objective
+Generate explainable signals without allowing automated adverse action.
+Backlog
+Define approved pilot risk use case, outcomes and exclusions.
+Create time-valid feature snapshots from event projections.
+Implement deterministic rules and a simple interpretable baseline model.
+Store version, feature time, score, threshold and reason codes.
+Create suppression, duplicate-case and human-review policy.
+Run historical backtest and subgroup error analysis.
+Expose predictions only to an evaluation dashboard in shadow mode.
+Capture reviewer feedback without changing model automatically.
+Acceptance
+No score uses data unavailable at the prediction time.
+Every score has reason codes and model/policy version.
+Performance, calibration and subgroup findings are documented.
+Business and governance owners approve or reject progression from shadow mode.
+15. Sprint 12 — Security, resilience and performance hardening
+Objective
+Prove that the pilot can fail safely and recover.
+Backlog
+Complete threat-model mitigations and penetration-test preparation.
+Run tenant-isolation, broken-object authorization, webhook replay, SSRF, malicious file and prompt-injection tests.
+Run database backup, point-in-time restore, object restore and projection rebuild exercises.
+Run steady-state, burst, slow-dependency, broker-backlog, GPU-saturation, inference-queue and complete AI-outage load tests.
+Tune indexes, pools, caching, queue partitions and worker concurrency from measurements.
+Create SLO dashboards and alerts.
+Write runbooks for connector, database, broker, search, notification, AI and tenant incidents.
+Generate SBOMs and sign release images.
+Acceptance
+No open critical security defect.
+Restore and rollback complete within approved objectives.
+Core latency and error targets pass representative load.
+AI saturation cannot starve Core resources.
+Every alert has an owner and linked runbook.
+16. Sprint 13 — Pilot migration and user acceptance
+Objective
+Operate the complete solution with approved pilot data and users before production cutover.
+Backlog
+Run historical trial and incremental synchronization.
+Reconcile current identities, enrolments, library balances and selected academic data.
+Create pilot users, roles and scoped permissions.
+Execute administrator, teacher, librarian, student and parent acceptance journeys.
+Train administrators, data stewards, support and pilot champions.
+Rehearse cutover, rollback, incident and communication plans.
+Run AI in approved scope and risk scoring in shadow mode.
+Capture defects, adoption issues and operational metrics.
+Acceptance
+Reconciliation gates pass or exceptions are formally accepted.
+Critical journeys pass with named business owners.
+Cutover and rollback are rehearsed, timed and approved.
+Support, escalation, monitoring and communication are operational.
+17. Sprint 14 — Production cutover and hypercare
+Objective
+Move approved capabilities into production with controlled ownership.
+Backlog
+Apply the go/no-go checklist and freeze required source functions only.
+Take final delta and verify control totals.
+Enable target writes only for approved domains.
+Monitor connector lag, queues, database, search, notifications, AI and user journeys through a command centre.
+Hold daily defect and reconciliation review during hypercare.
+Track adoption, support load, response times and data-quality exceptions.
+Close or assign all residual exceptions.
+Complete stabilization review and next-release prioritization.
+Acceptance
+No unexplained critical reconciliation difference.
+Source-of-truth ownership matches the approved matrix.
+Service levels remain stable through the agreed observation period.
+The institution signs stabilization, extension or rollback decision.
+18. Cross-cutting epics
+Security and privacy
+Tenant isolation, authorization, consent, masking, encryption, secret rotation, audit, retention and incident response are implemented continuously, not postponed to hardening.
+Developer experience
+One-command environment, realistic fixtures, fast tests, generated clients, stable local ports, migration tooling and troubleshooting documentation.
+Observability
+Every new service and important workflow includes logs, metrics, traces, dashboards and actionable alerts.
+Data governance
+Every canonical field has definition, owner, sensitivity, source authority, transformation and retention treatment.
+Accessibility and performance
+Keyboard navigation, readable contrast, responsive layouts, low-bandwidth behavior, pagination, incremental loading and query budgets are part of feature acceptance.
+19. Initial engineering tickets — start here
+P0 Create repository workspaces and root task runner.
+P0 Add Compose Core and AI profiles with network and resource isolation; include a GPU-enabled inference profile for the model router, embeddings and vLLM.
+P0 Create Python service template with configuration, health, telemetry and test harness.
+P0 Create Next.js shell with authentication boundary and generated-client placeholder.
+P0 Define request, error, pagination and idempotency conventions.
+P0 Define event envelope and outbox relay contract.
+P0 Create tenant-aware database base models and migration workflow.
+P0 Add CI for lint, type, unit, contract, image and secret scanning.
+P0 Add mock OIDC provider and tenant fixtures.
+P0 Add mock ERP dataset for school, college and university structures.
+P1 Implement tenant/campus domain and first create/read APIs.
+P1 Implement authorization decision interface and deny-by-default middleware.
+P1 Implement audit-event SDK and append-only store.
+P1 Create initial canonical person and enrolment JSON schemas.
+P1 Create adapter interface and mock ERP connector.
+P1 Create integration staging and reconciliation skeleton.
+20. Environment and release strategy
+Local
+Synthetic data only. All dependencies run through Compose. Developers can run only Core or add AI profile.
+Shared development
+Automatic deployment after main passes. Resettable synthetic or masked data. Used for integration and UI review.
+Test
+Stable environment for automated end-to-end, security and migration tests. Provider sandboxes and representative volumes.
+Pilot/UAT
+Institution-approved data, restricted access and release-candidate images. Changes require migration and rollback evidence.
+Production
+Signed immutable images, controlled promotion, protected secrets, audited access, backups and progressive deployment.
+Promotion path
+The same image digest moves from test to pilot to production. Configuration changes are versioned and validated. Database changes use expand/migrate/contract sequencing. Core and AI release independently.
+21. Pull-request and release gates
+Pull request
+Linked ticket and acceptance criteria.
+Architecture or contract note when boundaries change.
+Tests for new behavior and failure paths.
+Authorization and tenant-scope review.
+Migration and rollback impact.
+Observability and documentation update.
+No secrets or personal production data.
+Release candidate
+All required automated suites pass.
+OpenAPI and event compatibility pass.
+Database migrations tested against a production-like copy.
+Vulnerability findings are within policy.
+AI evaluation passes when AI artifacts change.
+Runbooks and alerts exist for new operations.
+Rollback is documented and, for high-risk changes, rehearsed.
+22. Pilot success measures
+Canonical synchronization completeness and freshness.
+Reconciliation exceptions by severity and time to close.
+Core API latency, error rate and availability.
+Case assignment, SLA adherence and outcome completion.
+Library circulation accuracy where in scope.
+Notification delivery and failure rate.
+Portal adoption by role and task completion.
+AI citation correctness, groundedness, refusal and user feedback.
+Security incidents and unauthorized-access test results.
+Support tickets, resolution time and user satisfaction.
+23. After the first pilot
+Use measured traffic, GPU saturation and total operating cost to size production infrastructure. Keep self-hosted AI mandatory, but scale it independently through larger or additional GPU nodes. Add more ERP adapters through the same connector contract and expand modules in dependency order. Consider native mobile, ClickHouse or a dedicated vector database only when measured requirements justify their operational cost.
+The first development action is Sprint 0 and Sprint 1 in parallel: finalize pilot decisions while the engineering team builds the monorepo, local platform, CI, service templates, telemetry and mock data. This creates progress without locking institution-specific assumptions into the architecture.
+Self-Hosted AI Architecture
+Self-Hosted AI Architecture and Model Strategy
+Implementation decision for the Education Success OS
+1. Executive decision
+The platform shall use self-hosted open-weight models. Production workflows shall not depend on OpenAI, Gemini, Anthropic or another externally billed model API. Core ERP services and the AI plane remain independently deployable within the monorepo. AI failure must never interrupt admissions, attendance, fees, examinations, library, identity or other core transactions.
+“Free model” means that the selected model weights do not incur a per-token vendor charge under their licence. Infrastructure, electricity, GPU capacity, storage, observability, security and engineering still have costs. The exact model and licence must pass legal and security review before production use.
+2. Build-versus-train decision
+Do not train a general-purpose foundation model from scratch. That path requires a very large curated corpus, substantial multi-GPU compute, specialist research staff, repeated safety training and continuous evaluation. It provides poor commercial return for the initial product.
+Build our proprietary Education AI Platform by combining:
+Open-weight instruction model hosted on our GPU infrastructure.
+Retrieval-augmented generation (RAG) over authorized institutional data.
+Education-specific prompts, policies, tools and workflows.
+Interpretable predictive models for dropout, attendance and intervention risk.
+Evaluation datasets and optional parameter-efficient fine-tuning adapters.
+Tenant isolation, authorization, audit and human approval controls.
+The resulting product is proprietary because its data contracts, retrieval layer, decision rules, workflow integrations, evaluation assets and fine-tuned adapters belong to the platform, even though the foundation model is open-weight.
+3. Model selection policy
+Start with an Apache-2.0-compatible 7B–14B instruction model that supports commercial self-deployment, structured output and the required languages. Candidate families may include Qwen or Mistral/Ministral, but selection is benchmark-driven and not permanently coupled to one vendor.
+The production model registry must record model ID, exact weight checksum, source, licence, quantization, tokenizer, context limit, safety configuration, deployment date, evaluation result and rollback version. Never download model weights dynamically in production.
+Selection gates:
+Commercial-use licence approved by legal review.
+Runs within the pilot GPU memory budget.
+Meets accuracy thresholds on our education evaluation set.
+Supports English and required Indian languages adequately.
+Produces reliable structured JSON and tool calls.
+Passes privacy, prompt-injection, harmful-content and tenant-isolation testing.
+Meets p95 latency and concurrency targets under load.
+4. AI deployment topology
+Portal -> API Gateway -> AI Gateway -> Agent Orchestrator
+-> Authorization API
+-> Retrieval Service -> pgvector/OpenSearch
+-> Approved Core read/action APIs
+-> Self-Hosted Model Router
+-> vLLM Inference Server
+-> GPU + versioned model weights
+-> Output validation and policy engine
+-> Audit and evaluation pipeline
+Deploy the following as separate containers or services:
+AI Gateway: authentication context, quotas, request validation and streaming.
+Agent Orchestrator: prompt assembly, tool selection, workflow state and citations.
+Retrieval Service: authorized hybrid search and context construction.
+Model Router: model/version selection, concurrency control and fallback.
+Inference Server: vLLM-hosted generation on GPU nodes.
+Embedding Service: self-hosted embedding model for document and query vectors.
+Reranker Service: optional self-hosted cross-encoder for improved relevance.
+Model Registry: approved artifacts, checksums, licences and deployment metadata.
+Evaluation Service: offline test suites, online quality signals and regression gates.
+Risk Scoring Service: separate classical ML service for interpretable predictions.
+No AI service may directly read a core service database. It must use tenant-scoped retrieval indexes or approved core APIs. No model may directly mutate any database. Actions pass through authorization, confirmation, validation, idempotency and audit in ordinary Core APIs.
+5. Pilot server configuration for 500 registered users
+Assume 50–150 monthly AI users, 5–10 normal simultaneous generations and short peaks up to 20 queued requests. Confirm these assumptions through a pilot load test.
+Recommended dedicated AI node:
+One NVIDIA GPU with 24 GB VRAM minimum for a quantized 7B–14B model; 48 GB VRAM is preferred for higher concurrency, longer context or a larger model.
+16–32 physical CPU cores.
+128 GB system RAM.
+2 TB enterprise NVMe storage for weights, indexes, caches and logs.
+Ubuntu LTS with NVIDIA drivers and the NVIDIA Container Toolkit.
+10 Gbps internal networking where the AI and data nodes are separate.
+UPS and redundant power for on-premises deployment.
+If Core and AI initially share one physical machine, reserve CPU, RAM and I/O for Core first; place strict GPU/CPU/memory limits on AI containers. Production should move AI inference to a dedicated GPU node before usage grows. The architecture must also support a second warm inference node for maintenance and failure recovery.
+6. Serving and performance controls
+Use vLLM for model serving, streaming and continuous batching. Expose an internal OpenAI-compatible endpoint only as a protocol convenience; it does not call OpenAI externally.
+Apply per-tenant and per-role quotas, maximum input/context/output tokens, bounded queues, request timeouts and cancellation. Cache safe, repeated, non-personal results. Use prefix caching where applicable. Protect Core APIs with bulkheads so GPU saturation cannot consume transactional resources.
+Initial service targets:
+Streamed first token p95 under 3 seconds at approved pilot concurrency.
+Interactive answer completion p95 under 15 seconds for normal requests.
+Queue wait p95 under 5 seconds under expected load.
+Zero cross-tenant retrieval results in automated security tests.
+Core workflows remain available during total AI-plane failure.
+7. RAG and institutional-data flow
+Document or ERP event -> ingestion queue -> malware and format validation -> text extraction -> classification -> access-label assignment -> chunking -> self-hosted embedding -> vector/index write -> reconciliation and audit.
+User question -> identity and authorization -> query classification -> authorized lexical/vector retrieval -> optional reranking -> fetch authoritative ERP facts through Core APIs -> assemble minimal context -> self-hosted generation -> citation verification -> output policy validation -> response and immutable audit record.
+Use RAG for changing or private facts: student records, attendance, marks, fees, timetables, library records, policies, circulars and regulations. Never fine-tune personal student data into a shared foundation model or adapter.
+8. Fine-tuning strategy
+Begin without fine-tuning. Establish a strong prompt-and-RAG baseline and collect evaluation evidence first. Fine-tune only when a repeatable failure cannot be solved reliably through retrieval, tools, schemas or prompting.
+Permitted fine-tuning targets:
+Education terminology and intent classification.
+Reliable structured reports and JSON schemas.
+Tool-selection and workflow-routing behaviour.
+Institution-approved response style.
+De-identified intervention classification examples.
+Use parameter-efficient fine-tuning such as LoRA/QLoRA rather than full-model training for the pilot. Maintain dataset lineage, consent/legal basis, de-identification records, train/validation/test separation, model-card updates and rollback artifacts. A model cannot be promoted solely because its training loss improved; it must pass the production evaluation suite.
+9. Predictive models versus language models
+Do not use the LLM as the primary student-risk score. Build separate interpretable models using scikit-learn or gradient-boosted trees for attendance risk, dropout risk, fee-risk and intervention prioritization. Use time-valid features, avoid future-data leakage, measure performance across relevant groups and return reason codes.
+The LLM may explain an approved risk result, summarize evidence and help staff prepare an intervention. It must not invent a score, diagnose a student or take punitive action. Human review is mandatory for consequential recommendations.
+10. Data and model database structures
+model_registry(model_id, name, family, version, source_uri, licence, checksum, quantization, tokenizer, context_limit, status, approved_by, approved_at)
+model_deployment(deployment_id, model_id, environment, endpoint, gpu_node, configuration_json, started_at, ended_at, rollback_deployment_id)
+prompt_template(prompt_id, use_case, version, template, schema_version, status, approved_by)
+knowledge_document(document_id, tenant_id, source_system, source_key, classification, access_scope, version, object_key, effective_from, effective_to)
+document_chunk(chunk_id, tenant_id, document_id, ordinal, text_hash, access_scope, embedding_model_id)
+document_embedding(chunk_id, embedding_model_id, embedding, created_at)
+ai_request(request_id, tenant_id, user_id, use_case, model_deployment_id, prompt_version, input_tokens, output_tokens, latency_ms, status, created_at)
+ai_retrieval(request_id, chunk_id, rank, score, authorization_decision_id)
+ai_response(response_id, request_id, citation_status, policy_result, user_feedback, retained_until)
+evaluation_case(case_id, use_case, dataset_version, input_ref, expected_ref, sensitivity_label)
+evaluation_run(run_id, model_id, prompt_version, dataset_version, metrics_json, gate_result, executed_at)
+training_dataset(dataset_id, purpose, version, lineage, deidentification_status, licence_status, approved_by)
+adapter_registry(adapter_id, base_model_id, dataset_id, method, version, checksum, evaluation_run_id, status)
+Store sensitive prompt and response bodies only when explicitly required and allowed by retention policy. Prefer hashes, references and redacted audit fields. All AI records carry tenant ID, model version, prompt version and authorization evidence.
+11. Monorepo changes
+Add the following structure:
+services/ai/ai_gateway/
+services/ai/agent_orchestrator/
+services/ai/retrieval/
+services/ai/model_router/
+services/ai/embedding_service/
+services/ai/reranker/
+services/ai/evaluation/
+services/ai/risk_scoring/
+packages/python/model_contracts/
+models/manifests/
+models/adapters/
+evaluation/datasets/
+evaluation/golden_tests/
+deploy/compose/ai-self-hosted.yml
+deploy/kubernetes/ai/
+deploy/helm/ai-inference/
+docs/model_cards/
+docs/ai_runbooks/
+Do not commit large model weights, training datasets, secrets or personal data to Git. Store weights and datasets in protected object storage or an internal artifact registry. Commit only manifests, checksums, schemas, configurations and reproducible training/evaluation code.
+12. Development sequence
+Phase A — Establish AI contracts, threat model, licence checklist, evaluation framework and representative de-identified test cases.
+Phase B — Deploy a candidate 7B–14B model through vLLM on the target GPU and benchmark latency, throughput, memory and output quality.
+Phase C — Implement self-hosted embeddings, ingestion, pgvector/OpenSearch retrieval, citations and tenant-scoped authorization tests.
+Phase D — Implement the AI Gateway, orchestration, output validation, quotas, streaming, audit and Core read tools.
+Phase E — Implement interpretable risk baselines in shadow mode; validate reason codes, calibration, fairness and staff usefulness.
+Phase F — Run security, prompt-injection, privacy, failover and load tests at 5, 10 and 20 simultaneous generations.
+Phase G — Pilot with selected roles, measure unanswered questions and unsafe/incorrect outputs, and tune retrieval and prompts.
+Phase H — Fine-tune a small adapter only if evaluation data demonstrates a persistent, high-value gap.
+13. Acceptance criteria before production
+No external model API traffic is required for normal operation.
+Model and embedding weights are pinned, checksummed and licence-approved.
+All retrieval is tenant- and role-scoped before context reaches the model.
+AI outage does not affect Core availability or data correctness.
+Every answer identifies model, prompt and source versions in audit records.
+Consequential actions require Core authorization and human confirmation.
+Golden-set quality, hallucination, citation, latency and security thresholds pass.
+Backup, restore, model rollback and GPU-node failure runbooks are tested.
+Operational dashboards report GPU memory, utilization, queue depth, tokens/second, first-token latency, request failures and retrieval quality.
+14. Cost model
+There is no third-party per-token API charge for normal operation. Track total cost of ownership instead: GPU purchase or rental, server depreciation, electricity, cooling, rack/hosting, storage, backups, monitoring, engineering, security and model maintenance.
+Calculate monthly AI cost per active user as:
+(monthly infrastructure depreciation or rental + electricity/hosting + AI operations labour + storage/backup) / monthly active AI users.
+Keep the AI platform independently deployable so a tenant can run it on institutional premises, in our managed private cloud or on a dedicated hosted GPU without changing Core service contracts.
+[TABLE 1]
+Blueprint metadata | Value
+Document type | Product and technical implementation blueprint
+Prepared | 28 July 2026
+Recommended launch | Pilot-first, existing-ERP integration strategy
+[TABLE 2]
+Decision | Recommendation | Reason
+Product entry | Integration-first intelligence layer | Reduces migration risk and shortens sales and pilot cycles.
+Initial buyers | Private schools, colleges and universities with usable digital data | They can prove value without first digitizing every process.
+First use cases | Retention, admissions and accreditation | Direct academic, financial and compliance value.
+AI strategy | Self-hosted open-weight LLM + RAG + rules + small predictive models | More accurate and economical than training a foundation model.
+ERP strategy | Coexist, then replace weak modules selectively | Creates a path to a complete platform without a risky big-bang launch.
+Library | Integrate first; provide a baseline native module later | Necessary for completeness, but not the initial differentiator.
+[TABLE 3]
+Build now | Integrate now | Build later
+Canonical data model | Existing ERP/SIS | Full admissions and finance ERP
+Student 360 and risk signals | LMS and assessment tools | Advanced library and acquisitions
+Intervention case management | Library systems | HR, payroll and procurement
+Role-aware agent experiences | Payments and messaging | Hostel, transport and canteen suites
+Policy RAG and rule service | Identity and document stores | Research, grants and alumni suite
+Principal/dean mission control | Government/regulatory interfaces | Complete ERP replacement edition
+[TABLE 4]
+Capability | School | College | University
+Hierarchy | Group, branch, grade, section | College, department, programme, batch | University, campus, faculty, department, programme
+Academic model | Board curriculum; assigned subjects | Semester/annual; electives as configured | Credit-based, electives, prerequisites and degree audit
+Assessment | Tests, terms and report cards | Internal and external examinations | Continuous assessment, GPA, credits and progression
+Guardian access | Primary operational role | Configurable and consent-aware | Normally limited for adult learners
+Leadership | Coordinator, vice-principal, principal | HOD, dean/principal, registrar | HOD, dean, registrar, pro-VC and VC
+Compliance | Boards, UDISE+, safety | Affiliation, NAAC, NBA, AISHE | UGC, NAAC, NBA, NIRF, AISHE
+Special modules | Transport, child safety, parent engagement | Placement, internships and affiliation | Research, grants, thesis, credit transfer and multi-campus
+[TABLE 5]
+Shared core | Optional operations | Intelligence differentiators
+Identity; profiles; admissions status; attendance; fees view; communications; documents; workflows; grievances | Library; hostel; transport; canteen; infirmary; inventory; procurement; payroll; placement; alumni; research | Retention; admissions conversion; compliance readiness; root-cause analysis; next-best action; intervention outcomes
+[TABLE 6]
+Experience | Primary jobs
+Student agent | Explain eligibility, deadlines, fees, results and services; prepare requests; guide recovery plans.
+Parent companion | Provide prioritized summaries, translations, meetings, consent and teacher-approved support actions.
+Teacher/mentor workspace | Surface class and mentee priorities, draft communication and manage interventions.
+Operations console | Review exceptions, reconcile data, manage cases and monitor integrations.
+Leadership mission control | Prioritize retention, admissions, compliance, finance and operational risks.
+[TABLE 7]
+Integration method | Use | Control
+REST/GraphQL API | Preferred real-time reads and approved writes | Scoped service accounts, rate limits and idempotency keys
+Webhooks/events | Attendance, payments, application status and deadline changes | Signed payloads, replay protection and dead-letter queue
+Scheduled SFTP/CSV | Legacy systems without reliable APIs | Schema validation, reconciliation and reject reports
+Read replica/view | High-volume institutional reporting | Read-only credentials and field-level filtering
+Browser/RPA adapter | Temporary bridge for inaccessible legacy workflows | Last resort; supervised and monitored
+[TABLE 8]
+Stage | Allowed behavior | Exit gate
+0 - Observe | Import data and produce quality reports | Identity matching and reconciliation meet agreed accuracy.
+1 - Explain | Answer questions and cite data/policies | Grounded-answer and authorization tests pass.
+2 - Prepare | Draft forms, cases and messages | Human reviewers accept quality and audit trail.
+3 - Confirmed action | Execute low-risk action after confirmation | Idempotency, rollback and validation proven.
+4 - Policy automation | Run approved routine actions automatically | Formal policy, monitoring and exception path established.
+[TABLE 9]
+Component | Responsibilities | Must not do
+Language model | Intent understanding, explanation, drafting, summarization and tool selection | Calculate authoritative fees, eligibility or permissions from memory
+RAG | Retrieve current policies, notices, manuals, curriculum and evidence | Use superseded documents without warning
+Rule engine | Attendance, credits, fees, promotion, approval authority and eligibility | Generate subjective student or staff judgments
+Predictive models | Retention, academic, fee, admission and demand risks | Treat probability as fact or determine punitive action
+Optimization | Timetable, rooms, routes, workload and allocation | Override approved constraints or human authority
+Workflow engine | Cases, tasks, approvals, SLAs, reminders and escalation | Execute sensitive actions without required confirmation
+[TABLE 10]
+Step | Deliverable | Quality gate
+Define outcome | Precise label and prediction horizon | Business owner signs definition.
+Assemble features | Time-valid, permission-approved signals | No prohibited or future information.
+Normalize | Canonical features across ERP vendors | Data-quality thresholds met.
+Train | Baseline and challenger models | Time-based train/validation/test split.
+Explain | Reason codes and supporting evidence | Explanation matches model behavior.
+Pilot | Human-reviewed recommendations | False positives and subgroup performance accepted.
+Monitor | Drift, calibration and outcome dashboards | Rollback and retraining triggers defined.
+[TABLE 11]
+Control area | Required design
+Tenant isolation | Separate tenant keys and access boundaries; tenant-scoped queries by default.
+Authorization | RBAC plus scope and relationship-aware checks at API and tool layers.
+Sensitive fields | Field-level encryption, masking and purpose-limited access.
+Consent | Capture guardian/student consent, purpose, expiry and withdrawal where applicable.
+Audit | Record input, retrieved evidence, rule/model version, recommendation, approval, action and result.
+AI safety | Prompt-injection defenses, tool allowlists, output validation and citation requirements.
+Human authority | Mandatory review for grades, admission, discipline, wellbeing, disability and major finance.
+Retention | Configurable retention schedules and secure deletion workflows.
+Incident response | Detection, containment, notification, recovery and post-incident review.
+[TABLE 12]
+Level | Behavior | Example
+L0 | Search only | Find the applicable examination policy.
+L1 | Explain | Explain why registration failed.
+L2 | Recommend | Suggest eligible alternative subjects.
+L3 | Prepare | Complete a request draft without submitting.
+L4 | Execute with confirmation | Submit an approved refund request.
+L5 | Execute automatically under policy | Send a routine reminder.
+L6 | Human-only decision | Final grade, expulsion or major financial waiver.
+[TABLE 13]
+Phase | Timing | Build activity | Exit gate
+0. Discovery and pilot selection | Weeks 1-3 | Select one design-partner institution; map its ERP, policies, hierarchy and top workflows. | Signed pilot charter, source-system inventory and measurable baseline.
+1. Product foundation | Weeks 2-6 | Establish tenants, environments, CI/CD, observability, identity and configuration framework. | Tenant isolation and deployment pipeline pass security review.
+2. Canonical data model | Weeks 4-9 | Model organization, people, academics, finance, engagement, cases and governance. | Pilot ERP data maps without vendor logic leaking into product services.
+3. First ERP connector | Weeks 6-11 | Implement read-only ingestion, identity resolution, reconciliation and error handling. | Agreed completeness, freshness and reconciliation thresholds achieved.
+4. Role and hierarchy engine | Weeks 7-11 | Configure roles, positions, scopes, relationships and approval authority. | Persona access tests show no unauthorized records.
+5. Student 360 | Weeks 9-13 | Unify academic, attendance, fees, engagement and service history. | Authorized staff can trace every value to its source.
+6. Policy knowledge service | Weeks 10-15 | Ingest approved policies with versioning, access metadata and citations. | Grounded-answer evaluation passes institution-approved questions.
+7. Agent shell | Weeks 12-17 | Build role-aware conversation, intent routing, tool calling and escalation. | Student, teacher and leader journeys pass red-team and usability tests.
+8. Retention intelligence | Weeks 14-21 | Build risk baseline, reason codes and human review workflow. | Model beats simple rules and meets accepted calibration/fairness gates.
+9. Intervention hub | Weeks 16-22 | Create cases, assignments, SLAs, approvals, evidence and outcome tracking. | Every surfaced risk can become a closed-loop intervention.
+10. Leadership mission control | Weeks 19-24 | Prioritize institutional risk and explain academic/financial impact. | Leaders can act from a short prioritized list, not raw dashboards.
+11. Pilot deployment | Weeks 25-32 | Run in shadow mode, then controlled production with weekly review. | Value, safety and adoption targets achieved against baseline.
+12. Admissions intelligence | Months 9-12 | Add conversion forecasting, applicant segmentation and next-best action. | Incremental conversion or response-time improvement measured.
+13. Compliance intelligence | Months 10-14 | Map evidence, detect gaps and coordinate corrective actions. | Preparation effort and missing-evidence rate improve.
+14. Platform expansion | Month 13+ | Add connectors, institution packs, optional modules and confirmed write actions. | Repeatable implementation and sales economics demonstrated.
+[TABLE 14]
+Capability | MVP acceptance condition
+ERP ingestion | Pilot data loads reliably, reconciles against source totals and exposes freshness.
+Student 360 | Authorized reviewer sees traceable cross-module context for one student.
+Risk detection | Retention signals provide probability/priority, reason codes and supporting records.
+Policy answers | Answers cite an approved current source or clearly decline.
+Intervention cases | Staff assign, track, escalate and close interventions with outcomes.
+Leader view | Prioritized risks include impact, evidence, owner, status and recommended action.
+Audit | Every sensitive view, recommendation, approval and action is recorded.
+Safety | Cross-user, cross-tenant and prompt-injection test suites pass.
+[TABLE 15]
+Stage | Scope
+MVP | Connect to the existing library; expose catalogue, loans, overdue items and clearance status.
+Native baseline | Catalogue, copies, barcode/RFID, issue/return/renewal, reservation, fines, membership and reports.
+Intelligence | Semantic discovery, course-linked recommendations, acquisition forecasting and unused-resource analysis.
+Advanced | Journals, digital rights, subscriptions, inter-library loans, stock verification and vendor acquisition.
+[TABLE 16]
+Workstream | Core roles | Primary ownership
+Product and domain | Product lead, education SME, implementation analyst | Outcomes, workflows, policy definitions and pilot success
+Platform | Architect, backend engineers, DevOps/SRE | Tenancy, APIs, events, configuration, workflow and reliability
+Data and ML | Data engineer, ML engineer, analytics engineer | Canonical model, features, models, evaluation and monitoring
+AI application | AI engineer, knowledge engineer | RAG, orchestration, tools, grounding and safety evaluation
+Experience | Designer, frontend/mobile engineers, accessibility QA | Role-specific journeys and low-bandwidth usability
+Security and governance | Security engineer, privacy/legal advisor | Threat model, controls, consent, audit and incident readiness
+Quality and implementation | QA automation, integration engineer, customer success | Test coverage, data reconciliation, rollout and adoption
+[TABLE 17]
+Test layer | Examples
+Product logic | Rules, workflow transitions, approval thresholds and SLA escalation
+Data | Mapping, duplicates, missingness, reconciliation, freshness and lineage
+Security | Tenant isolation, broken access control, injection, secrets and audit completeness
+AI quality | Intent, retrieval precision, groundedness, citations, tool selection and refusal
+Predictive quality | Calibration, precision/recall, lead time, subgroup performance and drift
+Integration | Timeouts, retries, webhook replay, duplicate action and partial failure
+User experience | Role tasks, mobile, low bandwidth, multilingual and accessibility
+Operations | Backup/restore, incident response, model rollback and connector recovery
+[TABLE 18]
+Pilot stage | Activities | Decision criterion
+Baseline | Measure current dropout indicators, intervention time, reporting effort and support workload. | Reliable pre-product baseline exists.
+Historical back-test | Test whether prior data contained usable early signals. | Model provides useful lead time and explainable reasons.
+Shadow mode | Generate recommendations without showing or acting on them. | Quality and safety reviewed by institution.
+Limited users | Release to a small mentor/support team. | Workflow adoption and case completion are acceptable.
+Controlled production | Add leader view and selected student communication. | No critical safety incidents; outcome trend is positive.
+Expansion | Add cohorts, use cases, write actions and campuses. | Implementation is repeatable and ROI is credible.
+[TABLE 19]
+Dimension | Example metrics
+Student | Risk lead time, intervention completion, attendance recovery and continuation rate
+Staff | Time to understand a case, administrative hours saved and cases per coordinator
+Leadership | Time to management brief, prioritized risks acted upon and unresolved SLA breaches
+AI | Grounded-answer rate, policy-version accuracy, false-positive rate and unauthorized-action rate
+Platform | Connector freshness, reconciliation accuracy, availability and incident recovery time
+Commercial | Implementation effort, annual value protected/created, willingness to renew and expand
+[TABLE 20]
+Risk | Mitigation
+Poor source data | Begin with data profiling, reconciliation and visible quality scores.
+ERP vendor blocks integration | Use customer-authorized exports, standard contracts and alternate read-only adapters.
+AI appears impressive but lacks ROI | Tie each workflow to baseline and outcome metrics.
+False or biased risk signals | Use interpretable baselines, human review, subgroup evaluation and appeal paths.
+Institution expects full ERP immediately | Maintain a published scope boundary and modular product roadmap.
+Policy answer becomes outdated | Require effective dates, owners, supersession links and review workflows.
+Staff resist additional work | Design the intervention flow inside existing responsibilities and measure time saved.
+Security review delays launch | Complete threat model, data-flow inventory and controls before production data.
+[TABLE 21]
+Period | Priority work | Concrete output
+Days 1-15 | Choose design partner; document top use case, systems, roles and baseline. | Pilot charter, success metrics, data inventory and responsibility matrix.
+Days 16-30 | Finalize architecture, canonical model v0.1, threat model and UX journeys. | Architecture decision records, schemas, prototypes and security plan.
+Days 31-45 | Build tenant foundation, identity, connector skeleton and ingestion monitoring. | Working staging platform with synthetic data.
+Days 46-60 | Connect pilot data read-only; build reconciliation and Student 360. | Traceable pilot dataset and first authorized user view.
+Days 61-75 | Build policy retrieval, risk baseline and intervention workflow. | End-to-end risk-to-case demonstration.
+Days 76-90 | Run evaluation, red-team testing and shadow-mode preparation. | Pilot readiness review with go/no-go evidence.
+[TABLE 22]
+Layer | Capability requirements
+Web/mobile | Responsive role-based application, offline drafts, accessibility and multilingual UX
+API/platform | Versioned services, policy enforcement, workflow, tenant configuration and audit
+Data | Operational relational store, event streaming, analytics warehouse/lakehouse and lineage
+Knowledge | Document parsing, metadata, vector/keyword retrieval, versioning and citations
+ML/AI | Self-hosted model router and vLLM inference, prompt registry, feature store, evaluation harness and model/GPU monitoring
+Integration | Connector SDK, secrets vault, scheduler, webhook gateway, retries and reconciliation
+Operations | CI/CD, infrastructure as code, logs, traces, metrics, backup and disaster recovery

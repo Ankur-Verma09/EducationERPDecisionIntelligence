@@ -1,0 +1,50 @@
+{
+  "package_id": "synthetic-reference-erp-v1",
+  "package_version": "1.0.0",
+  "classification": "generated-test-data-non-production",
+  "authoritative_for_real_connector": false,
+  "approved_for_demo": true,
+  "approval_scope": "demo-only-non-production",
+  "vendor": "Example Education Systems",
+  "product": "Synthetic Reference ERP",
+  "product_version": "1.0",
+  "transport": "in-process-read-only-csv-test-double",
+  "generated_at": "2026-08-05T00:00:00Z",
+  "seed": "education-success-os-sprint5-v1",
+  "prohibited_uses": [
+    "production connector configuration",
+    "real-person identity matching",
+    "real ERP acceptance thresholds",
+    "credential or network authorization"
+  ],
+  "files": {
+    "schemas": "schemas/source_bundle.schema.json",
+    "valid_records": "data/valid_records.json",
+    "negative_scenarios": "scenarios/negative_scenarios.json",
+    "transport_policy": "policies/transport_policy.json",
+    "identity_policy": "policies/identity_policy.json",
+    "field_dispositions": "policies/field_dispositions.json",
+    "privacy_policy": "policies/privacy_policy.json",
+    "threshold_policy": "policies/thresholds.json",
+    "matrices": "pilot_matrices.xlsx"
+  },
+  "sha256": {
+    "pilot_matrices.xlsx": "249B9C8AA9233B304E88A1812BE2C65D11CB2CB14BCF47322EB3C24B414F1234",
+    "README.md": "CF51FD2068FD05792574A83A8CF443AFEEEB6449B1B76184CD0056E2137735C3",
+    "data/valid_records.json": "486AB5EF4B970782B356584193FD885CFBBD977D163885164420A9085165515E",
+    "policies/identity_policy.json": "E00BB2ACAC73A7C16025AEB0C90FA5AA7DB87697B174D2DC65379CAB5D6155FB",
+    "policies/field_dispositions.json": "35D4BEF94C15FB5F6215AEF721B9B123FB62FC2556319E0799E99A74644588F0",
+    "policies/privacy_policy.json": "EFACB936295D2001BB602F085EA7ED539D6325B5F1F08E5CFB863F2D393895F1",
+    "policies/thresholds.json": "2A0D0E18C6D456846220D86D64499F93EECCC5AB9A8C577F98B3265C72DC83D7",
+    "policies/transport_policy.json": "87B36C7C131A6DDEAF4C4B79D2EA28CC4DD811DA5C32AB24FF412A157213B629",
+    "scenarios/negative_scenarios.json": "3BD9252F7A4A8B063E0299AA7B8AF34C6A833DD36727AA267F820286B16CA0F2",
+    "schemas/source_bundle.schema.json": "CDF3DEF7CA4046B3264371C18207F238FA9E0054B6DD64A6D7085C6F4B13F920"
+  },
+  "approvals": {
+    "demo_sponsor": "USER-APPROVED-2026-08-05",
+    "production_product_owner": "NOT-APPROVED",
+    "production_source_owner": "NOT-APPROVED",
+    "production_privacy_owner": "NOT-APPROVED",
+    "production_security_owner": "NOT-APPROVED"
+  }
+}

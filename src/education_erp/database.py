@@ -9,7 +9,7 @@ from sqlalchemy.pool import StaticPool
 
 from education_erp.config import Settings
 
-EXPECTED_DATABASE_REVISION = "0001"
+EXPECTED_DATABASE_REVISION = "0008"
 
 
 def create_database_engine(settings: Settings) -> Engine:

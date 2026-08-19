@@ -13,6 +13,16 @@ from education_erp.middleware import security_headers
 logger = logging.getLogger(__name__)
 
 
+class ApiError(Exception):
+    """Expected public API failure with a stable error code."""
+
+    def __init__(self, status_code: int, code: str, message: str) -> None:
+        super().__init__(message)
+        self.status_code = status_code
+        self.code = code
+        self.message = message
+
+
 def error_payload(
     *,
     code: str,
@@ -61,6 +71,18 @@ def install_error_handlers(app: FastAPI) -> None:
             content=error_payload(
                 code="internal_error",
                 message="An unexpected error occurred",
+                request_id=request.state.request_id,
+            ),
+            headers=security_headers(request.state.request_id),
+        )
+
+    @app.exception_handler(ApiError)
+    async def api_error(request: Request, exc: ApiError) -> JSONResponse:
+        return JSONResponse(
+            status_code=exc.status_code,
+            content=error_payload(
+                code=exc.code,
+                message=exc.message,
                 request_id=request.state.request_id,
             ),
             headers=security_headers(request.state.request_id),

@@ -2,8 +2,11 @@
 
 ## Document control
 
-- Status: Phase 1 locally accepted; remote CI execution is follow-up evidence
-- Updated: 2026-07-29
+- Status: Authoritative Phase 2 canonical/integration work is accepted for generated
+  scope. Authoritative Phase 3 Core Intervention Workflow design is independently
+  accepted; implementation awaits separate explicit user approval and has not
+  started. A real ERP remains blocked for pilot/production. Phase 4 has not started.
+- Updated: 2026-08-05
 - Authority: supplied project mandate; no product or design source documents were present
 - Change rule: material scope, security, tenancy, or data-governance decisions require an ADR
 
@@ -126,6 +129,20 @@ first time security is addressed.
 9. Add CI for build, tests, secret scanning, dependency audit, and static analysis.
 10. Add foundation unit/integration/API tests and update traceability/status records.
 
+## Authoritative roadmap clarification — 2026-08-05
+
+The latest local Education Success OS Engineering HLD and Implementation Backlog
+supersede the provisional phase table above for sequencing. Authoritative Phase 2
+contains canonical data and integration: Sprint 4 is the integration framework with
+a generated mock ERP adapter, and Sprint 5 is the first real ERP connector.
+Authoritative Phase 3 is the core intervention workflow; authoritative Phase 4 is
+the self-hosted knowledge/AI layer.
+
+The next executable unit is therefore **Phase 2 Sprint 4 — Integration Framework
+and Generated Mock Connector**. Its design package is independently reviewed but
+awaits explicit implementation approval. Sprint 5 remains blocked by the missing
+pilot ERP package. Phase 3 and Phase 4 have not started.
+
 ## Phase 1 entry criteria
 
 - Product owner accepts or amends Phase 0 assumptions.
@@ -162,3 +179,19 @@ enabled tests with 95.18% coverage, Alembic upgrade/downgrade/upgrade, image bui
 zero-critical Trivy scan, migration-first Compose startup, and live/ready container
 smoke tests. Phase 1 is locally accepted. A successful remote CI run remains
 recommended branch-governance evidence.
+
+## Current authoritative execution position — 2026-08-05
+
+Sprint 4 is accepted. Sprint 5 now has an independently accepted generated demo-only
+connector using `synthetic-reference-erp-v1@1.0.0`; it is not a real ERP connector
+and grants no production readiness. A real ERP connector remains blocked by owner-approved source,
+transport, credential, privacy and threshold inputs. Authoritative Phase 3
+interventions and Phase 4 AI services have not started.
+
+### Phase 3 sequencing reassessment
+
+The authoritative Phase 2 exit language permits a first ERP connector **or mock connector**. The accepted generated connectors satisfy Phase 3 sequencing without granting production readiness. The Authoritative Phase 3 Core Intervention Workflow design package is independently accepted. The next authorized gate is separate explicit user approval for implementation. The missing real ERP remains a parallel blocker for real-pilot and production validation. Phase 4 remains prohibited.
+
+### Phase 3 independently accepted design
+
+The intervention HLD, LLD, data model, API/event contract, threat model, implementation plan and entry reassessment are independently accepted after remediation. The package is deterministic, human-owned, generated-data-only and independent of AI availability. Implementation remains prohibited pending separate explicit user approval.

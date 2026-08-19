@@ -1,0 +1,15 @@
+{
+  "academic_periods": [{"period_id":"AP-2030","code":"AY2030","name":"Generated Academic Year 2030","period_type":"academic_year","starts_on":"2030-01-01","ends_on":"2030-12-31","updated_at":"2030-01-02T00:00:00Z"}],
+  "programmes": [{"programme_id":"P-0001","code":"SYN-BSC","version_code":"2030","name":"Generated Bachelor Programme","effective_from":"2030-01-01","updated_at":"2030-01-02T00:01:00Z"}],
+  "courses": [{"course_id":"C-0001","code":"SYN-101","version_code":"2030","title":"Generated Foundations","credit_value":10,"effective_from":"2030-01-01","updated_at":"2030-01-02T00:02:00Z"}],
+  "offerings": [{"offering_id":"O-0001","code":"SYN-101-A","period_id":"AP-2030","course_id":"C-0001","updated_at":"2030-01-02T00:03:00Z"}],
+  "learners": [
+    {"learner_id":"L-0001","institution_reference":"SYN-0001","updated_at":"2030-01-02T00:04:00Z"},
+    {"learner_id":"L-0002","institution_reference":"SYN-0002","updated_at":"2030-01-02T00:05:00Z"}
+  ],
+  "enrolments": [
+    {"enrolment_id":"E-0001","learner_id":"L-0001","programme_id":"P-0001","offering_id":"O-0001","effective_from":"2030-01-15","status":"active","updated_at":"2030-01-16T00:00:00Z"},
+    {"enrolment_id":"E-0002","learner_id":"L-0002","programme_id":"P-0001","offering_id":"O-0001","effective_from":"2030-01-15","status":"active","updated_at":"2030-01-16T00:01:00Z"}
+  ]
+}
+

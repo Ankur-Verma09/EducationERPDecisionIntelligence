@@ -1,0 +1,12 @@
+{
+  "classification": "mock-only-generated-data",
+  "lawful_purpose": "generated-data local demonstration, connector design and automated validation",
+  "allowed_attributes": ["source identifiers", "academic structure", "enrolment status", "effective timestamps"],
+  "prohibited_attributes": ["name", "date_of_birth", "health", "disability", "religion", "ethnicity", "biometrics", "free_text_notes", "contact_details"],
+  "landing_retention_hours": 24,
+  "quarantine_retention_days": 7,
+  "masking": "source identifiers exposed only as tenant-bound fingerprints outside protected lineage",
+  "deletion": "expired staging and quarantine deleted; minimized audit and lineage retained per governance",
+  "subject_rights": "mock data has no data subject; production replacement must define access/export/correction/deletion handling",
+  "encryption": "test database controls; production replacement must specify encryption and key ownership"
+}

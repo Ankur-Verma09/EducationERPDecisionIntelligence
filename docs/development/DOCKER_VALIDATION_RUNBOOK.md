@@ -1,10 +1,10 @@
-# Docker Development and Phase 1 Validation Runbook
+# Docker Development and Work Package 1 Validation Runbook
 
 ## Purpose
 
-This runbook documents how to authorize Docker Desktop, start and stop the local
-stack, run PostgreSQL migrations and tests, scan the application image, perform the
-container smoke test, and resolve the failures encountered during Phase 1 validation.
+This runbook documents Docker Desktop authorization, Core/AI-isolation profiles,
+PostgreSQL migrations and tests, all runtime-image scans, outage/smoke tests, and
+common validation failures.
 
 Run the commands from Windows PowerShell in:
 
@@ -44,8 +44,8 @@ Do not expose an unauthenticated Docker daemon on TCP port 2375.
 ## 2. Start the database only
 
 ```powershell
-docker compose up -d database
-docker compose ps
+docker compose -p phase2remediation --profile core up -d database
+docker compose -p phase2remediation ps
 ```
 
 Wait until PostgreSQL is healthy:
@@ -55,7 +55,7 @@ do {
     Start-Sleep -Seconds 2
     $health = docker inspect `
         --format '{{.State.Health.Status}}' `
-        educationerpdecisionintelligence-database-1 2>$null
+        phase2remediation-database-1 2>$null
     Write-Host "PostgreSQL health: $health"
 } until ($health -eq 'healthy')
 ```
@@ -66,15 +66,17 @@ do {
 $env:EDUERP_ENVIRONMENT = 'test'
 $env:EDUERP_DATABASE_URL = `
     'postgresql+psycopg://education_erp:local-only@localhost:5432/education_erp'
-$env:EDUERP_TEST_DATABASE_URL = $env:EDUERP_DATABASE_URL
+$env:EDUERP_MIGRATION_DATABASE_URL = $env:EDUERP_DATABASE_URL
 
-.\.venv\Scripts\python.exe -m alembic upgrade head
-.\.venv\Scripts\python.exe -m alembic downgrade base
-.\.venv\Scripts\python.exe -m alembic upgrade head
-.\.venv\Scripts\python.exe -m alembic current 2>&1
+docker compose -p phase2remediation run --rm migrate alembic current
+docker compose -p phase2remediation run --rm migrate alembic downgrade base
+docker compose -p phase2remediation run --rm migrate alembic upgrade 0006
+docker compose -p phase2remediation run --rm migrate alembic downgrade 0005
+docker compose -p phase2remediation run --rm migrate alembic upgrade 0006
+docker compose -p phase2remediation run --rm migrate alembic current
 ```
 
-The expected final revision is `0001 (head)`.
+The expected final revision is `0006 (head)` for Work Package 1.
 
 Alembic writes normal informational output to stderr. Windows PowerShell 5 may
 display this as `NativeCommandError` even when the command succeeds. Use
@@ -82,7 +84,21 @@ display this as `NativeCommandError` even when the command succeeds. Use
 
 ## 4. Run the complete PostgreSQL test suite
 
-Keep `EDUERP_TEST_DATABASE_URL` set and run the complete suite:
+Alembic uses the migration-owner URL above. Before running the Phase 2 application
+and RLS tests, switch to the non-bypass runtime login:
+
+```powershell
+$env:EDUERP_DATABASE_URL = `
+    'postgresql+psycopg://education_erp_app:local-runtime-only@localhost:5432/education_erp'
+$env:EDUERP_TEST_DATABASE_URL = $env:EDUERP_DATABASE_URL
+```
+
+On a fresh Compose volume, `docker/postgres/init/001-runtime-role.sql` creates this
+role. For an existing pre-Phase-2 volume, recreate the disposable local volume or
+provision the role and grants manually. Never validate RLS with `education_erp`, a
+database owner, a superuser, or a `BYPASSRLS` role.
+
+Then run the complete suite:
 
 ```powershell
 .\.venv\Scripts\python.exe -m pytest
@@ -93,26 +109,39 @@ Do not run only `tests\integration\test_database.py` without disabling the globa
 coverage gate. The tests can all pass while the command fails because one file alone
 cannot meet the repository-wide 90% coverage requirement.
 
-The verified Phase 1 result is 32 passed, no skips, and 95.18% coverage.
+The accepted Work Package 1 result is 97 passed with no skips and 90.91% coverage.
 
 ## 5. Build the images
 
 ```powershell
-docker compose build --no-cache api migrate
+docker compose -p phase2remediation --profile core --profile ai build `
+    api migrate database ai-contract-test-double
 $LASTEXITCODE
 ```
 
 The runtime uses `python:3.11-alpine`. The earlier Debian slim image contained four
 critical `perl-base` vulnerabilities without an available Debian fix.
 
-## 6. Scan the application image
+## 6. Scan every runtime image
 
 ```powershell
 docker run --rm `
     -v /var/run/docker.sock:/var/run/docker.sock `
     aquasec/trivy:0.58.2 `
     image --exit-code 1 --severity CRITICAL `
-    educationerpdecisionintelligence-api
+    phase2remediation-api
+
+docker run --rm `
+    -v /var/run/docker.sock:/var/run/docker.sock `
+    aquasec/trivy:0.58.2 `
+    image --exit-code 1 --severity CRITICAL `
+    phase2remediation-ai-contract-test-double
+
+docker run --rm `
+    -v /var/run/docker.sock:/var/run/docker.sock `
+    aquasec/trivy:0.58.2 `
+    image --exit-code 1 --severity CRITICAL `
+    phase2remediation-database
 
 $LASTEXITCODE
 ```
@@ -130,8 +159,8 @@ minutes. Informational messages written to stderr can appear as PowerShell
 ## 7. Start the complete stack
 
 ```powershell
-docker compose up -d
-docker compose ps
+docker compose -p phase2remediation --profile core up -d
+docker compose -p phase2remediation ps -a
 ```
 
 Compose starts PostgreSQL, runs the one-shot migration service, and then starts the
@@ -173,7 +202,21 @@ Invoke-RestMethod http://localhost:8000/api/v1/health/ready
 
 Both endpoints must return `status: ok`.
 
-## 9. View status and logs
+## 9. Prove AI outage isolation
+
+```powershell
+docker compose -p phase2remediation --profile ai up -d ai-contract-test-double
+docker compose -p phase2remediation stop ai-contract-test-double
+
+Invoke-RestMethod http://localhost:8000/api/v1/health/live
+Invoke-RestMethod http://localhost:8000/api/v1/health/ready
+```
+
+Both Core endpoints must remain `status: ok`. The AI container must have no host
+port, no Core database credential, and only the `core_ai_boundary` and `ai_internal`
+networks.
+
+## 10. View status and logs
 
 ```powershell
 docker compose ps
@@ -183,7 +226,7 @@ docker compose logs --follow api
 
 Press `Ctrl+C` to stop following logs; it does not stop the containers.
 
-## 10. Stop or reset Docker resources
+## 11. Stop or reset Docker resources
 
 Stop and remove project containers and network while preserving PostgreSQL data:
 
@@ -227,6 +270,35 @@ Resolution:
 3. Fully restart Docker Desktop.
 4. If Docker Desktop's per-user pipe still excludes the sandbox account, run the
    Docker commands from the account that launched Docker Desktop.
+
+### Docker Desktop Linux engine pipe does not exist
+
+Symptoms:
+
+```text
+open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified
+```
+
+Confirm Docker Desktop is running, Linux containers are selected, and the
+`desktop-linux` context is available:
+
+```powershell
+docker context ls
+docker --context desktop-linux info
+```
+
+If the pipe remains absent, fully quit Docker Desktop, start it interactively, and
+wait for the engine status to become ready. Restarting only the Windows service does
+not create the per-user Linux engine pipe.
+
+### PostgreSQL initialization bind mount stalls
+
+The Compose database uses `docker/postgres/Dockerfile`, which embeds the reviewed
+runtime-role initialization script. Do not restore the Windows host bind mount for
+`docker-entrypoint-initdb.d`; it stalled after the Docker Desktop upgrade.
+
+The derived image also replaces the upstream `gosu` binary with release 1.17 built
+by Go 1.25.7. This is required for the zero-critical Trivy gate.
 
 ### Global Python has no pip and `_distutils_hack` fails
 
@@ -284,7 +356,7 @@ Zero is success. Nonzero requires investigation.
 
 ```powershell
 Start-Transcript `
-    -Path E:\EducationERPDecisionIntelligence\phase1-docker-validation.log `
+    -Path E:\EducationERPDecisionIntelligence\phase2-docker-validation.log `
     -Force
 
 # Run validation commands.

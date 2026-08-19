@@ -1,0 +1,18 @@
+{
+  "classification": "mock-only-generated-data",
+  "version": "1",
+  "objects": {
+    "academic_periods": ["period_id", "code", "name", "period_type", "starts_on", "ends_on", "updated_at"],
+    "programmes": ["programme_id", "code", "version_code", "name", "effective_from", "updated_at"],
+    "courses": ["course_id", "code", "version_code", "title", "credit_value", "effective_from", "updated_at"],
+    "offerings": ["offering_id", "code", "period_id", "course_id", "updated_at"],
+    "learners": ["learner_id", "institution_reference", "updated_at"],
+    "enrolments": ["enrolment_id", "learner_id", "programme_id", "offering_id", "effective_from", "status", "updated_at"]
+  },
+  "required_multi_target_dispositions": {
+    "enrolments.enrolment_id": ["programme-enrolment.source_record_key", "offering-enrolment.source_record_key"],
+    "enrolments.effective_from": ["programme-enrolment.effective_from", "offering-enrolment.effective_from"],
+    "enrolments.status": ["programme-enrolment.status", "offering-enrolment.status"]
+  },
+  "timestamp_disposition": "updated_at maps to ingestion-metadata.source_updated_at for every source object"
+}

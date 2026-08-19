@@ -1,0 +1,144 @@
+Self-Hosted AI Architecture and Model Strategy
+Implementation decision for the Education Success OS
+1. Executive decision
+The platform shall use self-hosted open-weight models. Production workflows shall not depend on OpenAI, Gemini, Anthropic or another externally billed model API. Core ERP services and the AI plane remain independently deployable within the monorepo. AI failure must never interrupt admissions, attendance, fees, examinations, library, identity or other core transactions.
+“Free model” means that the selected model weights do not incur a per-token vendor charge under their licence. Infrastructure, electricity, GPU capacity, storage, observability, security and engineering still have costs. The exact model and licence must pass legal and security review before production use.
+2. Build-versus-train decision
+Do not train a general-purpose foundation model from scratch. That path requires a very large curated corpus, substantial multi-GPU compute, specialist research staff, repeated safety training and continuous evaluation. It provides poor commercial return for the initial product.
+Build our proprietary Education AI Platform by combining:
+Open-weight instruction model hosted on our GPU infrastructure.
+Retrieval-augmented generation (RAG) over authorized institutional data.
+Education-specific prompts, policies, tools and workflows.
+Interpretable predictive models for dropout, attendance and intervention risk.
+Evaluation datasets and optional parameter-efficient fine-tuning adapters.
+Tenant isolation, authorization, audit and human approval controls.
+The resulting product is proprietary because its data contracts, retrieval layer, decision rules, workflow integrations, evaluation assets and fine-tuned adapters belong to the platform, even though the foundation model is open-weight.
+3. Model selection policy
+Start with an Apache-2.0-compatible 7B–14B instruction model that supports commercial self-deployment, structured output and the required languages. Candidate families may include Qwen or Mistral/Ministral, but selection is benchmark-driven and not permanently coupled to one vendor.
+The production model registry must record model ID, exact weight checksum, source, licence, quantization, tokenizer, context limit, safety configuration, deployment date, evaluation result and rollback version. Never download model weights dynamically in production.
+Selection gates:
+Commercial-use licence approved by legal review.
+Runs within the pilot GPU memory budget.
+Meets accuracy thresholds on our education evaluation set.
+Supports English and required Indian languages adequately.
+Produces reliable structured JSON and tool calls.
+Passes privacy, prompt-injection, harmful-content and tenant-isolation testing.
+Meets p95 latency and concurrency targets under load.
+4. AI deployment topology
+Portal -> API Gateway -> AI Gateway -> Agent Orchestrator
+-> Authorization API
+-> Retrieval Service -> pgvector/OpenSearch
+-> Approved Core read/action APIs
+-> Self-Hosted Model Router
+-> vLLM Inference Server
+-> GPU + versioned model weights
+-> Output validation and policy engine
+-> Audit and evaluation pipeline
+Deploy the following as separate containers or services:
+AI Gateway: authentication context, quotas, request validation and streaming.
+Agent Orchestrator: prompt assembly, tool selection, workflow state and citations.
+Retrieval Service: authorized hybrid search and context construction.
+Model Router: model/version selection, concurrency control and fallback.
+Inference Server: vLLM-hosted generation on GPU nodes.
+Embedding Service: self-hosted embedding model for document and query vectors.
+Reranker Service: optional self-hosted cross-encoder for improved relevance.
+Model Registry: approved artifacts, checksums, licences and deployment metadata.
+Evaluation Service: offline test suites, online quality signals and regression gates.
+Risk Scoring Service: separate classical ML service for interpretable predictions.
+No AI service may directly read a core service database. It must use tenant-scoped retrieval indexes or approved core APIs. No model may directly mutate any database. Actions pass through authorization, confirmation, validation, idempotency and audit in ordinary Core APIs.
+5. Pilot server configuration for 500 registered users
+Assume 50–150 monthly AI users, 5–10 normal simultaneous generations and short peaks up to 20 queued requests. Confirm these assumptions through a pilot load test.
+Recommended dedicated AI node:
+One NVIDIA GPU with 24 GB VRAM minimum for a quantized 7B–14B model; 48 GB VRAM is preferred for higher concurrency, longer context or a larger model.
+16–32 physical CPU cores.
+128 GB system RAM.
+2 TB enterprise NVMe storage for weights, indexes, caches and logs.
+Ubuntu LTS with NVIDIA drivers and the NVIDIA Container Toolkit.
+10 Gbps internal networking where the AI and data nodes are separate.
+UPS and redundant power for on-premises deployment.
+If Core and AI initially share one physical machine, reserve CPU, RAM and I/O for Core first; place strict GPU/CPU/memory limits on AI containers. Production should move AI inference to a dedicated GPU node before usage grows. The architecture must also support a second warm inference node for maintenance and failure recovery.
+6. Serving and performance controls
+Use vLLM for model serving, streaming and continuous batching. Expose an internal OpenAI-compatible endpoint only as a protocol convenience; it does not call OpenAI externally.
+Apply per-tenant and per-role quotas, maximum input/context/output tokens, bounded queues, request timeouts and cancellation. Cache safe, repeated, non-personal results. Use prefix caching where applicable. Protect Core APIs with bulkheads so GPU saturation cannot consume transactional resources.
+Initial service targets:
+Streamed first token p95 under 3 seconds at approved pilot concurrency.
+Interactive answer completion p95 under 15 seconds for normal requests.
+Queue wait p95 under 5 seconds under expected load.
+Zero cross-tenant retrieval results in automated security tests.
+Core workflows remain available during total AI-plane failure.
+7. RAG and institutional-data flow
+Document or ERP event -> ingestion queue -> malware and format validation -> text extraction -> classification -> access-label assignment -> chunking -> self-hosted embedding -> vector/index write -> reconciliation and audit.
+User question -> identity and authorization -> query classification -> authorized lexical/vector retrieval -> optional reranking -> fetch authoritative ERP facts through Core APIs -> assemble minimal context -> self-hosted generation -> citation verification -> output policy validation -> response and immutable audit record.
+Use RAG for changing or private facts: student records, attendance, marks, fees, timetables, library records, policies, circulars and regulations. Never fine-tune personal student data into a shared foundation model or adapter.
+8. Fine-tuning strategy
+Begin without fine-tuning. Establish a strong prompt-and-RAG baseline and collect evaluation evidence first. Fine-tune only when a repeatable failure cannot be solved reliably through retrieval, tools, schemas or prompting.
+Permitted fine-tuning targets:
+Education terminology and intent classification.
+Reliable structured reports and JSON schemas.
+Tool-selection and workflow-routing behaviour.
+Institution-approved response style.
+De-identified intervention classification examples.
+Use parameter-efficient fine-tuning such as LoRA/QLoRA rather than full-model training for the pilot. Maintain dataset lineage, consent/legal basis, de-identification records, train/validation/test separation, model-card updates and rollback artifacts. A model cannot be promoted solely because its training loss improved; it must pass the production evaluation suite.
+9. Predictive models versus language models
+Do not use the LLM as the primary student-risk score. Build separate interpretable models using scikit-learn or gradient-boosted trees for attendance risk, dropout risk, fee-risk and intervention prioritization. Use time-valid features, avoid future-data leakage, measure performance across relevant groups and return reason codes.
+The LLM may explain an approved risk result, summarize evidence and help staff prepare an intervention. It must not invent a score, diagnose a student or take punitive action. Human review is mandatory for consequential recommendations.
+10. Data and model database structures
+model_registry(model_id, name, family, version, source_uri, licence, checksum, quantization, tokenizer, context_limit, status, approved_by, approved_at)
+model_deployment(deployment_id, model_id, environment, endpoint, gpu_node, configuration_json, started_at, ended_at, rollback_deployment_id)
+prompt_template(prompt_id, use_case, version, template, schema_version, status, approved_by)
+knowledge_document(document_id, tenant_id, source_system, source_key, classification, access_scope, version, object_key, effective_from, effective_to)
+document_chunk(chunk_id, tenant_id, document_id, ordinal, text_hash, access_scope, embedding_model_id)
+document_embedding(chunk_id, embedding_model_id, embedding, created_at)
+ai_request(request_id, tenant_id, user_id, use_case, model_deployment_id, prompt_version, input_tokens, output_tokens, latency_ms, status, created_at)
+ai_retrieval(request_id, chunk_id, rank, score, authorization_decision_id)
+ai_response(response_id, request_id, citation_status, policy_result, user_feedback, retained_until)
+evaluation_case(case_id, use_case, dataset_version, input_ref, expected_ref, sensitivity_label)
+evaluation_run(run_id, model_id, prompt_version, dataset_version, metrics_json, gate_result, executed_at)
+training_dataset(dataset_id, purpose, version, lineage, deidentification_status, licence_status, approved_by)
+adapter_registry(adapter_id, base_model_id, dataset_id, method, version, checksum, evaluation_run_id, status)
+Store sensitive prompt and response bodies only when explicitly required and allowed by retention policy. Prefer hashes, references and redacted audit fields. All AI records carry tenant ID, model version, prompt version and authorization evidence.
+11. Monorepo changes
+Add the following structure:
+services/ai/ai_gateway/
+services/ai/agent_orchestrator/
+services/ai/retrieval/
+services/ai/model_router/
+services/ai/embedding_service/
+services/ai/reranker/
+services/ai/evaluation/
+services/ai/risk_scoring/
+packages/python/model_contracts/
+models/manifests/
+models/adapters/
+evaluation/datasets/
+evaluation/golden_tests/
+deploy/compose/ai-self-hosted.yml
+deploy/kubernetes/ai/
+deploy/helm/ai-inference/
+docs/model_cards/
+docs/ai_runbooks/
+Do not commit large model weights, training datasets, secrets or personal data to Git. Store weights and datasets in protected object storage or an internal artifact registry. Commit only manifests, checksums, schemas, configurations and reproducible training/evaluation code.
+12. Development sequence
+Phase A — Establish AI contracts, threat model, licence checklist, evaluation framework and representative de-identified test cases.
+Phase B — Deploy a candidate 7B–14B model through vLLM on the target GPU and benchmark latency, throughput, memory and output quality.
+Phase C — Implement self-hosted embeddings, ingestion, pgvector/OpenSearch retrieval, citations and tenant-scoped authorization tests.
+Phase D — Implement the AI Gateway, orchestration, output validation, quotas, streaming, audit and Core read tools.
+Phase E — Implement interpretable risk baselines in shadow mode; validate reason codes, calibration, fairness and staff usefulness.
+Phase F — Run security, prompt-injection, privacy, failover and load tests at 5, 10 and 20 simultaneous generations.
+Phase G — Pilot with selected roles, measure unanswered questions and unsafe/incorrect outputs, and tune retrieval and prompts.
+Phase H — Fine-tune a small adapter only if evaluation data demonstrates a persistent, high-value gap.
+13. Acceptance criteria before production
+No external model API traffic is required for normal operation.
+Model and embedding weights are pinned, checksummed and licence-approved.
+All retrieval is tenant- and role-scoped before context reaches the model.
+AI outage does not affect Core availability or data correctness.
+Every answer identifies model, prompt and source versions in audit records.
+Consequential actions require Core authorization and human confirmation.
+Golden-set quality, hallucination, citation, latency and security thresholds pass.
+Backup, restore, model rollback and GPU-node failure runbooks are tested.
+Operational dashboards report GPU memory, utilization, queue depth, tokens/second, first-token latency, request failures and retrieval quality.
+14. Cost model
+There is no third-party per-token API charge for normal operation. Track total cost of ownership instead: GPU purchase or rental, server depreciation, electricity, cooling, rack/hosting, storage, backups, monitoring, engineering, security and model maintenance.
+Calculate monthly AI cost per active user as:
+(monthly infrastructure depreciation or rental + electricity/hosting + AI operations labour + storage/backup) / monthly active AI users.
+Keep the AI platform independently deployable so a tenant can run it on institutional premises, in our managed private cloud or on a dedicated hosted GPU without changing Core service contracts.

@@ -1,0 +1,13 @@
+{
+  "classification": "mock-only",
+  "version": "1",
+  "learner_stable_key": "learner_id",
+  "learner_display_reference": "institution_reference",
+  "normalization": ["unicode-nfc", "trim", "case-sensitive-stable-key"],
+  "match_rule": "exact tenant + source system + learner_id",
+  "ambiguous_result": "reconciliation-required",
+  "automatic_merge": false,
+  "correction_rule": "new source version with effective_at",
+  "late_arrival_rule": "authority-and-temporal-reconciliation-no-silent-overwrite"
+}
+

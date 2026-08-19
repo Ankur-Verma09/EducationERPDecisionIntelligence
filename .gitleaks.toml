@@ -1,0 +1,10 @@
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Exclude local tooling, generated evidence, and third-party environments."
+paths = [
+  '''(^|/)(\.venv|\.cache|\.audit-cache|\.git|\.mypy_cache|\.pytest_cache|\.ruff_cache|\.docker-config)(/|$)''',
+  '''(^|/)phase[12]-.*\.log$''',
+  '''(^|/)(sbom\.json|\.coverage)$''',
+]

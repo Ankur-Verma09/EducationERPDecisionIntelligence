@@ -1,0 +1,15 @@
+{
+  "classification": "generated-test-data-non-production",
+  "scenarios": [
+    {"id":"schema-drift-extra-field","expected":"source_schema_unsupported","mutation":{"entity":"learner","extra_field":"generated-unknown"}},
+    {"id":"prohibited-child-attribute","expected":"record_quarantined","mutation":{"entity":"learner","field":"health_note","value":"generated-prohibited"}},
+    {"id":"duplicate-version","expected":"duplicate","mutation":{"entity":"learner","source_key":"L-0001","source_version":"1"}},
+    {"id":"ambiguous-identity","expected":"identity_ambiguous","mutation":{"entity":"learner","institution_reference":"SYN-0001","second_source_key":"L-9999"}},
+    {"id":"late-correction","expected":"reconcile_without_overwrite","mutation":{"entity":"academic_period","source_key":"AP-2030","effective_at":"2029-12-01T00:00:00Z","name":"Generated stale name"}},
+    {"id":"transport-timeout","expected":"transport_unavailable","mutation":{"after_records":1}},
+    {"id":"transport-throttled","expected":"bounded_retry","mutation":{"status":429,"retry_after_seconds":2}},
+    {"id":"credential-rejected","expected":"transport_unauthorized","mutation":{"status":401}},
+    {"id":"oversized-record","expected":"record_quarantined","mutation":{"generated_text_bytes":1048577}}
+  ]
+}
+

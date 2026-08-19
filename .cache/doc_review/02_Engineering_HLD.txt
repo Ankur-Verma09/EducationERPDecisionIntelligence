@@ -1,0 +1,261 @@
+Education Success OS - Engineering High-Level Design
+Architecture decision record for a 100,000-user, integration-first education platform
+1. Architecture decisions
+Decision 1 - Python is suitable for the backend and AI platform, but the complete system should not be Python-only. Use Python for APIs, domain services, integrations, background workers, data pipelines, machine learning and AI orchestration. Use TypeScript for the browser application because it provides the strongest modern web ecosystem, compile-time UI contracts and better client-side performance and maintainability.
+Decision 2 - Divide the system into two deployment planes: Core Platform (non-AI) and AI/Decision Intelligence. They live in one monorepo, share contracts and platform libraries, but build into different images and deploy independently. AI failure must never make attendance, fees, cases, identity or other core workflows unavailable.
+Decision 3 - A single physical machine is acceptable for local development, demonstration and an early pilot. It is not the production target for 100,000 users. Production must run the same containers across multiple nodes with load balancing, replicated state stores and failure isolation. “100,000 users” is treated as registered users; initial sizing assumes 10,000 daily active users, 2,000 peak concurrent sessions and approximately 500 sustained API requests/second with short bursts to 1,500 requests/second. These numbers must be replaced by measured pilot traffic before procurement.
+Decision 4 - Begin as an integration and intelligence layer over existing ERPs. Every service owns its data and exposes contracts; services must not directly read another service’s tables. Use synchronous APIs for immediate commands and queries, and durable events for propagation and read models.
+Decision 5 - Optimize retrieval with purpose-built stores: PostgreSQL for transactions, Redis for hot data and rate limiting, OpenSearch for lexical/hybrid search, pgvector for the first vector workload, object storage for documents and ClickHouse only when leadership analytics outgrow PostgreSQL read replicas/materialized views.
+2. Quality attributes and design targets
+Availability: Core Platform target 99.9% initially, evolving to 99.95%; AI plane can have a lower independent SLO without affecting core transactions.
+Latency: p95 under 250 ms for cached reads, under 500 ms for ordinary core APIs, under 2 seconds for complex dashboards, and streamed first AI token under 3 seconds when the self-hosted inference service is healthy.
+Scale: stateless services scale horizontally; no user session is stored in an application process.
+Tenant isolation: every request carries tenant, user, role and scope claims; every datastore query enforces tenant boundaries.
+Consistency: strong consistency for identity, finance state, permissions and workflow transitions; eventual consistency for search, analytics, notifications and AI indexes.
+Auditability: immutable record of source data, policy version, rule/model version, recommendation, approval, tool call and outcome.
+Recoverability: defined RPO/RTO, automated backups, point-in-time recovery and tested restoration.
+Accessibility and low bandwidth: responsive PWA, incremental loading, compressed payloads, offline drafts and multilingual UI.
+3. Recommended technology stack
+3.1 Application languages and frameworks
+Backend and AI: Python 3.14.x, pinned by service image. Use FastAPI for HTTP APIs, Pydantic v2 for contracts, SQLAlchemy 2.x plus psycopg 3 for PostgreSQL, Alembic for migrations and gRPC only for high-throughput internal calls that justify the added complexity.
+Web portal: TypeScript 5.x, Next.js 16.2, React 19.x and Node.js 24 LTS. Use server rendering for fast initial pages, a client query cache for interactive screens and generated OpenAPI clients for end-to-end typing.
+Mobile: launch as a responsive installable PWA. Add React Native only after usage data proves that device-specific capabilities or app-store distribution are necessary.
+Data/ML: Polars or DuckDB for local analytical processing, scikit-learn and gradient-boosted trees for interpretable predictive baselines, and PyTorch only when a validated use case needs deep learning.
+3.2 Data and retrieval
+Transactional database: PostgreSQL 18 with PgBouncer, primary plus read replicas, PITR backups and tenant-aware composite indexes.
+Cache/session/rate limits: Redis 8.x cluster. Cache only reconstructable data; never make Redis the sole store for authoritative records.
+Event streaming: Apache Kafka 4.x for durable domain events, connector ingestion and analytics feeds. For a smaller pilot, start with a three-broker-compatible deployment or managed Kafka rather than embedding an in-process queue.
+Search: OpenSearch 3.7 or the latest supported 3.x patch at implementation time. Use it for notices, policies, people/catalogue discovery, logs and hybrid lexical/vector retrieval.
+Vector retrieval: PostgreSQL pgvector 0.8.x with HNSW for MVP knowledge bases. Move very large or specialized vector workloads to an independent vector service only after measured recall, latency and operating-cost evidence.
+Object storage: S3-compatible storage for source documents, exports, evidence and immutable model artifacts. Store only metadata and object keys in PostgreSQL.
+Analytics: begin with PostgreSQL read replicas and materialized views. Add ClickHouse when event volume and multi-dimensional leadership queries justify a columnar analytical store.
+3.3 Workflow, deployment and operations
+Durable workflows: Temporal with Python workers for long-running approvals, ERP synchronization, intervention SLAs and retryable cross-service orchestration.
+Containerization: separate OCI images for each service. Docker Compose profiles for development/pilot; Kubernetes for production horizontal scaling and rolling deployments.
+Gateway: Envoy, Kong or a cloud-managed API gateway for TLS termination, authentication integration, rate limits, routing and request IDs. Do not expose internal services directly.
+Observability: OpenTelemetry instrumentation, Prometheus metrics, Grafana dashboards and centralized logs/traces. Define SLO alerts before production.
+Secrets and keys: cloud KMS/Vault-compatible secret storage. Never put credentials in the monorepo or container image.
+CI/CD: GitHub Actions or equivalent, security scanning, signed images, SBOMs, database migration gates and progressive deployments.
+4. Deployment topology
+Internet / Mobile / ERP Webhooks
+|
+CDN + WAF + Load Balancer
+|
+API Gateway
+/           \
+Core Platform     AI Platform
+(Kubernetes ns)   (separate ns)
+|                |
+PostgreSQL/Redis   Model gateway + retrieval
+\                /
+Kafka + Temporal
+|
+PostgreSQL | OpenSearch | Object Storage
+|
+Analytics read models
+On one machine, Core and AI use separate Compose profiles, networks, service accounts, CPU/memory limits and deployment commands. In production, use separate Kubernetes namespaces and node pools. AI workers may use GPU nodes; core services remain CPU-only. Network policies allow AI services to call only approved read APIs and controlled action tools, never core databases directly.
+4.1 Single-machine pilot boundaries
+Run reverse proxy, core services, AI services, PostgreSQL, Redis, Kafka-compatible broker, OpenSearch and object storage as separate containers.
+Reserve CPU and memory for core services before allocating AI workers. Apply hard resource limits so embedding or model jobs cannot starve login or transactional APIs.
+Use a dedicated self-hosted GPU inference machine during the pilot when shared-machine inference would exceed available memory, GPU capacity or Core isolation limits.
+Back up PostgreSQL and object storage outside the machine. A backup on the same disk is not disaster recovery.
+5. Monorepo and independent-service design
+education-success-os/
+apps/
+web/                         # Next.js portal
+services/core/
+identity/ organization/ academic/
+workflow_case/ integration/ notification/
+document/ search_api/ audit/
+services/ai/
+ai_gateway/ knowledge_ingestion/ retrieval/ model_router/
+embedding_service/ reranker/ inference_vllm/
+risk_scoring/ recommendation/ evaluation/
+packages/python/
+contracts/ authz_sdk/ observability/ event_sdk/ testing/
+packages/typescript/
+api_client/ ui/ auth/ telemetry/
+contracts/
+openapi/ protobuf/ events/ jsonschema/
+db/
+migrations/ seeds/ local/
+deploy/
+compose/ kubernetes/ helm/ terraform/
+tests/
+contract/ integration/ performance/ security/
+docs/
+adr/ runbooks/ data_dictionary/
+Use uv workspaces for Python and pnpm workspaces plus Turborepo for TypeScript. A root task runner provides lint, type-check, test, build and image commands. CI detects changed services but always runs contract compatibility tests for shared schemas.
+5.1 Service rules
+Each service has one bounded business capability, its own API, migrations, deployment image, health checks, SLO and owner.
+Each service owns its database or PostgreSQL schema. Cross-service SQL joins are prohibited.
+Public APIs use versioned REST/JSON. Internal synchronous calls use REST first; introduce gRPC only after profiling.
+Publish domain events through an outbox table in the same transaction as the state change. A relay publishes to Kafka, preventing lost events.
+Consumers are idempotent, store processed event IDs and tolerate replay and out-of-order delivery where the contract permits.
+Shared packages contain infrastructure concerns and contracts, not domain business logic that couples services.
+Deployments are independent: a new AI image, prompt or model cannot require a core-platform release.
+6. Module and service catalogue
+6.1 Core Platform - non-AI deployment
+Identity Service: users, authentication federation, MFA state, sessions, service accounts and token revocation.
+Organization and Authorization Service: tenants, campuses, departments, roles, positions, scopes, relationships, delegations and policy decisions.
+Academic Profile Service: student/staff profiles, programmes, cohorts, enrolments and canonical academic references imported from ERP.
+Integration Service: connectors, source mappings, sync jobs, webhooks, reconciliation, dead-letter handling and connector health.
+Workflow and Case Service: interventions, tasks, approvals, SLAs, escalation, evidence, comments and outcomes.
+Notification Service: templates, preferences, email/SMS/push/approved messaging channels, delivery receipts and digests.
+Document and Policy Service: document metadata, versioning, access labels, effective dates, object-storage keys and evidence relationships.
+Search API Service: authorized query facade over OpenSearch; applies tenant and scope filters before results leave the service.
+Audit Service: append-only security, administrative and AI decision records with retention controls.
+Reporting Read Service: precomputed role-specific summaries; never executes expensive multi-service joins on a user request.
+6.2 AI and Decision Intelligence deployment
+AI Gateway: model routing, prompt templates, token budgets, safety filters, response streaming and provider failover.
+Agent Orchestrator: identity-aware intent routing, retrieval, rule/tool selection, confirmation requirements and action validation.
+Knowledge Ingestion Service: virus scanning, parsing, chunking, metadata extraction, embedding, indexing and policy supersession.
+Retrieval Service: hybrid lexical/vector retrieval, reranking, authorization filters, citations and retrieval-quality telemetry.
+Risk Scoring Service: versioned features, batch/online inference, reason codes, calibration and drift monitoring.
+Recommendation Service: next-best-action candidates constrained by policy, available resources and human approval.
+Evaluation Service: offline test sets, groundedness, retrieval precision, language quality, bias checks and release gates.
+AI Worker Pool: asynchronous ingestion, embeddings, batch scoring and evaluation; horizontally scalable and separately resource-limited.
+7. Database high-level design
+Use one PostgreSQL cluster for the pilot, but separate databases or schemas by service ownership. Every business table includes tenant_id, an ordered UUID/UUIDv7 primary key, created_at, updated_at, version for optimistic concurrency and source lineage when imported. Use row-level security as defense in depth, not as a substitute for service authorization.
+7.1 Core entity groups
+identity_db
+users, external_identities, credentials, sessions, service_accounts
+organization_db
+tenants, campuses, org_units, positions, roles, permissions
+role_bindings, scopes, relationships, delegations
+academic_db
+people, students, guardians, staff, programmes, courses, cohorts
+enrolments, class_sections, attendance_facts, assessment_facts
+integration_db
+connectors, source_entities, id_mappings, sync_runs, sync_errors
+workflow_db
+cases, case_subjects, tasks, approvals, escalations
+interventions, intervention_events, outcomes
+notification_db
+templates, preferences, messages, deliveries, digests
+content_db
+documents, document_versions, policies, chunks_metadata, evidence_links
+audit_db
+audit_events, access_events, ai_decisions, retention_holds
+7.2 AI data structures
+ai_control_db
+model_registry, prompt_versions, tool_definitions, evaluations
+conversations, turns, retrieval_runs, tool_runs, feedback
+feature_db
+feature_definitions, feature_snapshots, prediction_runs
+predictions, explanations, drift_metrics
+vector store
+document_chunk_embeddings(tenant_id, policy_version_id, chunk_id, embedding)
+search index
+authorized denormalized documents with tenant/scope/effective-date fields
+7.3 Indexing and partitioning
+All high-volume indexes begin with tenant_id. Examples: (tenant_id, external_id), (tenant_id, student_id, event_time DESC), (tenant_id, status, due_at) and partial indexes for open/active records.
+Partition append-only attendance, audit, notification delivery and integration event tables by month or academic period after measured size warrants it.
+Use UUIDv7/time-ordered identifiers to reduce random B-tree writes and simplify event ordering.
+Use GIN indexes for JSONB only on queried paths; promote frequently filtered fields into typed columns.
+Use HNSW vector indexes per embedding model and tenant group where necessary. Evaluate recall against exact search before tuning for speed.
+Use PgBouncer transaction pooling. Apply statement timeouts and separate connection pools for APIs, workers and analytics.
+7.4 Data ownership and consistency
+Source-of-truth ERP records retain source_system, source_key, source_version and last_synced_at.
+Core services never overwrite authoritative ERP facts unless a configured write-back workflow is approved.
+Search and reporting stores are rebuildable projections fed by domain events.
+Delete/rectification workflows publish events so search, vectors, caches, object metadata and analytics are updated consistently.
+8. Flow design
+8.1 Authentication and authorized core request
+User -> Gateway -> Identity verification -> Authorization decision
+-> Target core service -> PostgreSQL transaction
+-> Outbox event -> Kafka -> projections/notifications/audit
+<- response with request_id and version
+8.2 ERP synchronization
+Scheduler/Webhook -> Integration Service -> staging validation
+-> identity mapping -> canonical transformation -> service API/import command
+-> transaction + outbox -> Kafka -> search/reporting projections
+-> reconciliation totals -> connector health dashboard
+-> retry or dead-letter queue on failure
+8.3 AI answer with retrieval
+User -> Gateway -> AI Gateway -> Agent Orchestrator
+-> Core Authorization API
+-> Retrieval Service (tenant + scope + effective-date filter)
+-> Rule/Core read APIs for authoritative facts
+-> LLM generation with citations
+-> output validation and policy filter
+-> streamed response + immutable AI decision audit
+8.4 AI-assisted action
+Recommendation -> autonomy policy -> prepare action
+-> show evidence, impact and confirmation requirement
+-> user confirms / approver approves
+-> Orchestrator calls approved Core API with idempotency key
+-> Core service validates again and commits
+-> result validation -> audit -> intervention outcome tracking
+8.5 Student-risk batch scoring
+Scheduled Temporal workflow -> snapshot time-valid features
+-> Risk Scoring Service -> prediction + reason codes
+-> threshold and suppression rules -> create/update intervention case
+-> assign owner and SLA -> notify staff
+-> capture action and outcome -> monitoring/evaluation dataset
+No LLM directly mutates databases. All actions go through ordinary core APIs, which repeat authorization, validation, idempotency and audit checks.
+9. Capacity and performance design for 100,000 users
+9.1 Workload assumptions
+100,000 registered users across multiple tenants; 10,000 daily active users.
+2,000 peak concurrent sessions; 500 sustained and 1,500 burst API requests/second.
+Read-heavy profile of approximately 80% reads and 20% writes.
+AI usage limited by role and budget: initially 20-50 concurrent generations, with retrieval traffic higher than generation traffic.
+Seasonal spikes during admissions, results, attendance windows and fee deadlines require pre-scaling and queue protection.
+9.2 Scaling controls
+CDN caches static assets; gateway applies per-user, per-tenant and per-route rate limits.
+Stateless API replicas autoscale on concurrency, p95 latency and CPU, not CPU alone.
+Redis caches stable reference data and short-lived read models with event-driven invalidation.
+PostgreSQL primary handles writes; read replicas serve safe read models. Slow dashboards are precomputed asynchronously.
+Kafka partitions use tenant or aggregate keys to preserve ordering while allowing parallel consumers.
+OpenSearch indexes are tenant-filtered and sharded by measured index size; avoid one index per small tenant.
+AI requests use queues, concurrency limits, streaming responses, token budgets and circuit breakers. When AI is degraded, core workflows display a clear unavailable state instead of timing out.
+9.3 Performance validation
+Use k6 or Locust for API tests, OpenSearch Benchmark for search, pgbench/custom scenarios for PostgreSQL and end-to-end admission/result-day simulations.
+Test steady state, burst, dependency slowdown, broker backlog, replica loss, GPU saturation and self-hosted inference-node failure.
+Production sizing is approved only after measured p50/p95/p99 latency, saturation, error rate and cost per transaction are available.
+10. Security and tenant isolation
+Use OIDC/OAuth 2.1 federation, short-lived access tokens, refresh-token rotation and MFA for privileged roles.
+Authorization combines RBAC, organizational scope, student/guardian relationship, purpose and delegated authority.
+Encrypt data in transit and at rest; use separate keys or key contexts for sensitive tenants where required.
+Mask sensitive fields in logs, traces, support tools and model context. Include only the minimum authorized personal data required for the use case, even though inference is self-hosted.
+Apply WAF, input validation, malware scanning, egress allowlists, SSRF controls and prompt-injection defenses.
+Store audit events append-only and export them to tamper-resistant storage.
+Run dependency, container, IaC and secret scans in CI; generate an SBOM and sign production images.
+Perform threat modeling and tenant-escape testing before every major authorization or connector change.
+11. Reliability and operations
+Core service readiness checks include required database and broker dependencies; liveness checks detect dead processes without causing restart loops.
+Use timeouts, bounded retries with jitter, circuit breakers and bulkheads. Never retry a non-idempotent action without an idempotency key.
+Define RPO/RTO per data class. Test PostgreSQL PITR, object restoration and search-index rebuilds.
+Use blue/green or canary deployment for core APIs and model/prompt releases. Database migrations are backward compatible during rollout.
+Maintain runbooks for ERP connector failure, GPU or model-serving outage, search degradation, queue backlog, tenant incident and data correction.
+Key dashboards: golden signals, tenant traffic, connector freshness, database saturation, Kafka lag, workflow backlog, retrieval quality, GPU utilization, queue depth, tokens per second and AI infrastructure cost.
+12. Implementation sequence
+Phase 1 - Repository and platform foundation: monorepo, CI/CD, service template, identity, gateway, observability and local Compose profiles.
+Phase 2 - Canonical data and integration: organization, academic profile, first ERP connector, mapping, reconciliation and outbox events.
+Phase 3 - Core intervention workflow: case service, notifications, audit and reporting read model.
+Phase 4 - Self-hosted knowledge and AI foundation: licence-approved model manifests, vLLM inference, self-hosted embeddings, document ingestion, hybrid retrieval, AI gateway, citations and evaluation harness.
+Phase 5 - Retention intelligence: time-valid features, interpretable baseline model, reason codes and human review.
+Phase 6 - Pilot hardening: load tests, tenant security tests, backups, runbooks, shadow mode and SLO acceptance.
+Phase 7 - Production scaling: Kubernetes multi-node deployment, database replicas, OpenSearch cluster, broker HA and progressive rollout.
+Phase 8 - Additional use cases: admissions intelligence, compliance evidence and selective ERP module replacement.
+13. Decisions deliberately deferred
+Dedicated vector database: defer until pgvector/OpenSearch cannot meet measured recall, latency or operating-cost targets.
+ClickHouse: defer until analytics volume or latency justifies a separate analytical store.
+Native mobile apps: defer until PWA analytics reveal a device-specific requirement.
+Training a foundation model from scratch: do not include in the initial roadmap. Use a licence-approved open-weight model, RAG and optional LoRA/QLoRA adapters; reconsider pretraining only if future evidence establishes a unique data and economic advantage.
+Service mesh: defer until service count and traffic-policy complexity justify the operational cost.
+Cross-region active-active: defer until contractual availability and data-residency requirements are known.
+14. Final recommendation
+Build the backend and AI services in Python, but use TypeScript/Next.js for the user-facing portal. Keep Core and AI as separately deployable planes in one monorepo. Start on one machine only for development and pilot validation, with strict container isolation. Design every service as horizontally scalable from day one, and move production to a multi-node Kubernetes environment before claiming support for 100,000 users.
+The fastest retrieval architecture is not one database for everything. Use PostgreSQL for correctness, Redis for hot data, OpenSearch for full-text and hybrid discovery, pgvector for controlled semantic retrieval, Kafka for asynchronous propagation and precomputed read models for dashboards. Add specialized stores only when measured workloads prove the need.
+15. Primary technical references
+Python 3.14 documentation: https://docs.python.org/3.14/
+FastAPI deployment guidance: https://fastapi.tiangolo.com/deployment/
+PostgreSQL 18 documentation: https://www.postgresql.org/docs/current/
+Redis documentation: https://redis.io/docs/latest/
+pgvector indexing and scaling guidance: https://github.com/pgvector/pgvector
+Next.js 16.2 release information: https://nextjs.org/blog
+Node.js release policy and LTS status: https://nodejs.org/en/about/previous-releases
+OpenSearch releases: https://opensearch.org/releases/
+Kubernetes supported releases: https://kubernetes.io/releases/
+Docker Compose profiles: https://docs.docker.com/compose/how-tos/profiles/

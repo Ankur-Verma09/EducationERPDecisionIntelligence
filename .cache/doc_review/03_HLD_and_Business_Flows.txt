@@ -1,0 +1,70 @@
+HLD and Business Flow Design
+High-level architecture, stakeholder journeys and system boundaries
+1. How to read this design
+The HLD shows the system’s major actors, deployable planes, data boundaries and integration direction. It answers what the platform contains, who interacts with it and how the major parts depend on each other. The LLD tab separately explains service-level sequences, database ownership, states, retries and approval behavior.
+2. Non-technical stakeholder flow
+This business flow is intended for owners, principals, deans, teachers and implementation teams. It explains how the product converts fragmented institutional signals into coordinated human intervention.
+Observe institutional signals
+(attendance • grades • fees • wellbeing • library)
+↓
+Detect risk, opportunity or service need
+↓
+Explain evidence and recommend next-best action
+↓
+Human reviews, assigns owner and approves action
+↓
+Student / parent / teacher engagement
+↓
+Measure outcome, learn and improve policy
+↺
+Figure H1. Institutional success flow from observation to measured outcome.
+3. System context
+The Education Success OS sits between institutional users and existing systems. Existing ERP/LMS products remain authoritative during the integration-first stage; the new platform provides intelligence, coordination and outcome tracking.
+Students • Parents • Teachers • Counsellors • Librarians
+Principals / Deans • Owners • Administrators
+↓
+Web and mobile portal
+↓
+API gateway + identity
+↙           ↘
+Core platform     AI platform
+↘           ↙
+Governed data and events
+↑
+Existing ERP • SIS • LMS • Library • Payments • Messaging
+Figure H2. System context and external actors.
+4. Independently deployable Core and AI planes
+Core Platform and AI Platform share contracts and a monorepo, but they run as separate deployments. The AI plane includes self-hosted embeddings, retrieval, model routing and vLLM GPU inference. It can fail, restart or scale without interrupting identity, synchronization, workflows, cases or audit operations.
+CORE PLATFORM — independent deployment
+Gateway | Identity | Tenant | Integration | Student | Academic
+Attendance | Assessment | Workflow | Intervention | Library | Audit
+│ APIs + versioned events
+▼
+AI PLATFORM — independent deployment
+AI Gateway | Retrieval | Risk Scoring | Recommendations | Model Router
+Agent Orchestrator | Guardrails | Evaluation | Model Registry | vLLM GPU Inference
+Shared infrastructure: PostgreSQL • Redis • Event Bus • OpenSearch
+Separate health checks, scaling, release pipelines and rollback.
+Figure H3. High-level service and deployment planes.
+5. Technical data movement
+ERP and LMS data enters through controlled connectors, is validated and mapped into canonical domain commands, then produces durable events. Search, reporting and AI feature stores are rebuildable projections rather than alternate systems of record.
+ERP / LMS / SIS / Library / Finance
+↓
+Connector adapters → Validation → Canonical commands
+↓
+Core domain services
+↓
+PostgreSQL + Outbox
+↓
+Event bus / asynchronous workers
+↙             ↓              ↘
+OpenSearch       Reporting store     AI features
+↘             ↓              ↙
+Dashboards • alerts • decisions
+Figure H4. Technical data flow from source systems to decisions.
+6. HLD boundary decisions
+The web portal calls services only through the API gateway.
+AI services access core information only through authorized APIs and event feeds, never by reading core databases directly.
+Each core domain service owns its writes and publishes domain events with the outbox pattern.
+PostgreSQL is authoritative for transactions; Redis, OpenSearch, vectors and reporting stores are reconstructable acceleration layers.
+A single server is acceptable for development and pilot deployment. Production support for 100,000 registered users requires multiple application nodes and replicated stateful services.

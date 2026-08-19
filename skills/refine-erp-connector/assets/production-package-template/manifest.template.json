@@ -1,0 +1,28 @@
+{
+  "package_id": "REQUIRED",
+  "package_version": "REQUIRED",
+  "vendor": "REQUIRED",
+  "product": "REQUIRED",
+  "product_version": "REQUIRED",
+  "source_release": "REQUIRED",
+  "classification": "production-authority-package-no-live-data",
+  "authoritative_for_real_connector": true,
+  "transport": "REQUIRED_READ_ONLY_TRANSPORT",
+  "files": {
+    "source_inventory": "source_inventory.json",
+    "schemas": "schemas/",
+    "mappings": "policies/field_dispositions.json",
+    "authority": "policies/source_authority.json",
+    "identity": "policies/identity.json",
+    "transport": "policies/transport.json",
+    "privacy": "policies/privacy.json",
+    "thresholds": "policies/thresholds.json"
+  },
+  "approvals": {
+    "product_owner": {"name": "REQUIRED", "approval_id": "REQUIRED", "date": "REQUIRED"},
+    "source_owner": {"name": "REQUIRED", "approval_id": "REQUIRED", "date": "REQUIRED"},
+    "privacy_owner": {"name": "REQUIRED", "approval_id": "REQUIRED", "date": "REQUIRED"},
+    "security_owner": {"name": "REQUIRED", "approval_id": "REQUIRED", "date": "REQUIRED"}
+  },
+  "sha256": {}
+}

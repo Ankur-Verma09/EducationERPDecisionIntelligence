@@ -15,6 +15,7 @@ RUN pip install --upgrade pip \
 
 COPY alembic.ini ./
 COPY migrations ./migrations
+COPY docs/pilot/mock/synthetic_reference_erp_v1 /app/demo-package
 
 USER app
 EXPOSE 8000

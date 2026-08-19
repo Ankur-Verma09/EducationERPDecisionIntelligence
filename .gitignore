@@ -28,3 +28,12 @@ obj/
 .vs/
 dist/
 build/
+models/weights/
+models/adapters/**/*.bin
+models/adapters/**/*.safetensors
+evaluation/datasets/private/
+*.gguf
+*.safetensors
+*.ckpt
+*.pt
+*.pth

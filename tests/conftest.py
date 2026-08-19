@@ -22,6 +22,6 @@ def client(settings: Settings) -> Iterator[TestClient]:
     app = create_app(settings)
     with app.state.database_engine.begin() as connection:
         connection.execute(text("CREATE TABLE alembic_version (version_num VARCHAR(32) NOT NULL)"))
-        connection.execute(text("INSERT INTO alembic_version (version_num) VALUES ('0001')"))
+        connection.execute(text("INSERT INTO alembic_version (version_num) VALUES ('0008')"))
     with TestClient(app) as test_client:
         yield test_client

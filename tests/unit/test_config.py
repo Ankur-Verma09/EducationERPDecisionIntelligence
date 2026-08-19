@@ -44,9 +44,30 @@ def test_production_accepts_explicit_safe_configuration() -> None:
         ),
         allowed_hosts=("api.example.edu",),
         docs_enabled=False,
+        oidc_issuer_url="https://identity.example",
+        oidc_audience="education-api",
+        cursor_signing_key="externally-managed-cursor-signing-key",
+        demo_connector_enabled=False,
     )
     assert settings.environment == "production"
     assert settings.docs_enabled is False
+    assert settings.demo_connector_enabled is False
+
+
+def test_production_rejects_enabled_demo_connector() -> None:
+    with pytest.raises(ValidationError, match="demo connector"):
+        Settings(
+            environment="production",
+            database_url=(
+                "postgresql+psycopg://service:external@database.internal/education_erp"
+                "?sslmode=require"
+            ),
+            allowed_hosts=("api.example.edu",),
+            docs_enabled=False,
+            oidc_issuer_url="https://identity.example",
+            oidc_audience="education-api",
+            cursor_signing_key="externally-managed-cursor-signing-key",
+        )
 
 
 def test_production_rejects_wildcard_host() -> None:

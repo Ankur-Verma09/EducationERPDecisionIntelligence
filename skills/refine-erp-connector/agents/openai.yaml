@@ -1,0 +1,4 @@
+interface:
+  display_name: "Refine ERP Connector"
+  short_description: "Qualify and refine safe ERP integrations"
+  default_prompt: "Use $refine-erp-connector to qualify an ERP source package and refine its design, data contracts, tests, and implementation gate."

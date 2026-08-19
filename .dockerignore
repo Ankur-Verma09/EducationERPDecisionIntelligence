@@ -9,4 +9,10 @@
 coverage.xml
 .env
 tests
-docs
+docs/*
+!docs/pilot/
+docs/pilot/*
+!docs/pilot/mock/
+docs/pilot/mock/*
+!docs/pilot/mock/synthetic_reference_erp_v1/
+!docs/pilot/mock/synthetic_reference_erp_v1/**

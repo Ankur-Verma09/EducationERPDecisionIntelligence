@@ -1,0 +1,11 @@
+{
+  "classification": "mock-only-not-production-authority",
+  "version": "1",
+  "completeness_min_percent": 100.0,
+  "freshness_max_minutes": 60,
+  "rejection_max_percent": 5.0,
+  "duplicate_max_percent": 2.0,
+  "unresolved_reconciliation_max_count": 0,
+  "unexplained_count_variance_max": 0,
+  "promotion_on_breach": "blocked"
+}

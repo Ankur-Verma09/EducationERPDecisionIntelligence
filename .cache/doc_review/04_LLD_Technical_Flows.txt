@@ -1,0 +1,64 @@
+LLD Technical Flow Design
+Service sequences, state transitions, database ownership and operational behavior
+1. Database ownership
+Each service owns a database or PostgreSQL schema. Cross-service SQL joins are prohibited. Synchronous APIs and durable domain events are the supported boundaries; search, reporting and AI stores consume authorized projections.
+Identity Service ───────→ identity_schema
+Student Service ────────→ student_schema
+Academic Service ───────→ academic_schema
+Workflow Service ───────→ workflow_schema
+Intervention Service ───→ intervention_schema
+Library Service ────────→ library_schema
+Integration Service ────→ integration_schema
+Audit Service ──────────→ immutable_audit_schema
+Owned writes → Outbox → Event Bus → Search / Reporting / AI projections
+Rule: no service reads or writes another service’s schema directly.
+Figure L1. Database ownership and read-model boundaries.
+2. Grounded AI answer sequence
+The orchestrator verifies identity and scope, retrieves authorized evidence, obtains authoritative facts from Core APIs and only then invokes the self-hosted model through the Model Router and vLLM inference service. The final answer is validated, cited and audited.
+User → AI Gateway: question + session token
+AI Gateway → Identity/Policy: authenticate, tenant and scope
+AI Gateway → Orchestrator: normalized intent
+Orchestrator → Retrieval: tenant-filtered semantic search
+Orchestrator → Core APIs: current authoritative facts
+Orchestrator → Guardrails: redact and validate context
+Orchestrator → Model Router → vLLM GPU Inference: prompt + evidence + policy
+Self-hosted model → Guardrails: draft answer
+Guardrails → User: validated answer + citations
+Orchestrator → Audit: sources, versions, latency and result
+Figure L2. Detailed sequence for an AI answer with citations.
+3. AI-assisted approved action sequence
+The model cannot write to a database. It prepares a proposed action, shows evidence, obtains confirmation or approval, and calls an approved Core API. The Core service repeats authorization and validation before committing.
+User → AI Gateway: request an action
+AI Gateway → Orchestrator: identity + tenant + intent
+Orchestrator → Retrieval/Core APIs: obtain authorized evidence
+Orchestrator → Model Router → self-hosted vLLM model: draft proposed action; no write access
+Model → User: proposal + evidence + expected impact
+User/Approver → Orchestrator: confirm or reject
+Orchestrator → Core API: signed command + idempotency key
+Core API → Policy Engine: re-authorize and validate
+Core API → PostgreSQL/Outbox: atomic commit + domain event
+Audit Service ← all steps, tool calls and outcome
+Figure L3. Detailed sequence for a confirmed AI-assisted action.
+4. Intervention case state model
+Risks are operational only when they become owned cases. The state model supports review, assignment, SLA escalation, evidence collection, outcome measurement and cancellation with a recorded reason.
+DETECTED → TRIAGED → ASSIGNED → IN PROGRESS → RESOLVED → CLOSED
+│           │          │             │              │
+│           │          └─ SLA timer ─┴─ escalation ─┘
+│           └─ reject / false positive → CANCELLED
+└─ duplicate → link to existing case
+Reopen: RESOLVED or CLOSED → ASSIGNED
+Every transition records actor, time, reason, evidence and tenant.
+Figure L4. Intervention state transitions and exception paths.
+5. Service-level contracts
+Every command includes tenant_id, actor_id, request_id and idempotency_key.
+Every event includes event_id, event_type, aggregate_id, tenant_id, occurred_at, schema_version and trace_id.
+Every AI decision records retrieved sources, policy version, model and prompt version, tool calls, confirmation and final result.
+Authorization is evaluated again inside the target Core service; gateway authorization alone is insufficient.
+Consumers persist processed event IDs so replay does not create duplicate state.
+6. Failure and recovery behavior
+Transient dependency failures use bounded retry with exponential backoff and jitter.
+Permanent validation failures return structured error codes and are not retried automatically.
+Failed integration events move to a dead-letter queue and appear in reconciliation reports.
+If the Model Router, vLLM server, embedding service or GPU node is unavailable, Core Platform workflows remain usable and show a clear degraded-state message. Requests already queued receive a bounded retry or explicit failure; they never block Core threads.
+Search and reporting indexes can be rebuilt from domain events without modifying source records.
+Non-idempotent external actions require an idempotency key and stored provider response before retry.

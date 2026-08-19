@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:synthetic-reference-erp:v1:source-bundle",
+  "title": "Generated Synthetic Reference ERP source bundle",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["academic_periods", "programmes", "courses", "offerings", "learners", "enrolments"],
+  "properties": {
+    "academic_periods": {"type": "array", "items": {"$ref": "#/$defs/academic_period"}},
+    "programmes": {"type": "array", "items": {"$ref": "#/$defs/programme"}},
+    "courses": {"type": "array", "items": {"$ref": "#/$defs/course"}},
+    "offerings": {"type": "array", "items": {"$ref": "#/$defs/offering"}},
+    "learners": {"type": "array", "items": {"$ref": "#/$defs/learner"}},
+    "enrolments": {"type": "array", "items": {"$ref": "#/$defs/enrolment"}}
+  },
+  "$defs": {
+    "academic_period": {
+      "type": "object", "additionalProperties": false,
+      "required": ["period_id", "code", "name", "period_type", "starts_on", "ends_on", "updated_at"],
+      "properties": {
+        "period_id": {"type": "string", "pattern": "^AP-[0-9]{4}$"}, "code": {"type": "string", "maxLength": 40},
+        "name": {"type": "string", "maxLength": 120}, "period_type": {"enum": ["academic_year", "term"]},
+        "starts_on": {"type": "string", "format": "date"}, "ends_on": {"type": "string", "format": "date"},
+        "updated_at": {"type": "string", "format": "date-time"}
+      }
+    },
+    "programme": {
+      "type": "object", "additionalProperties": false,
+      "required": ["programme_id", "code", "version_code", "name", "effective_from", "updated_at"],
+      "properties": {"programme_id": {"type": "string"}, "code": {"type": "string"}, "version_code": {"type": "string"}, "name": {"type": "string"}, "effective_from": {"type": "string", "format": "date"}, "updated_at": {"type": "string", "format": "date-time"}}
+    },
+    "course": {
+      "type": "object", "additionalProperties": false,
+      "required": ["course_id", "code", "version_code", "title", "credit_value", "effective_from", "updated_at"],
+      "properties": {"course_id": {"type": "string"}, "code": {"type": "string"}, "version_code": {"type": "string"}, "title": {"type": "string"}, "credit_value": {"type": "number", "minimum": 0, "maximum": 100}, "effective_from": {"type": "string", "format": "date"}, "updated_at": {"type": "string", "format": "date-time"}}
+    },
+    "offering": {
+      "type": "object", "additionalProperties": false,
+      "required": ["offering_id", "code", "period_id", "course_id", "updated_at"],
+      "properties": {"offering_id": {"type": "string"}, "code": {"type": "string"}, "period_id": {"type": "string"}, "course_id": {"type": "string"}, "updated_at": {"type": "string", "format": "date-time"}}
+    },
+    "learner": {
+      "type": "object", "additionalProperties": false,
+      "required": ["learner_id", "institution_reference", "updated_at"],
+      "properties": {"learner_id": {"type": "string", "pattern": "^L-[0-9]{4}$"}, "institution_reference": {"type": "string", "pattern": "^SYN-[0-9]{4}$"}, "updated_at": {"type": "string", "format": "date-time"}}
+    },
+    "enrolment": {
+      "type": "object", "additionalProperties": false,
+      "required": ["enrolment_id", "learner_id", "programme_id", "offering_id", "effective_from", "status", "updated_at"],
+      "properties": {"enrolment_id": {"type": "string"}, "learner_id": {"type": "string"}, "programme_id": {"type": "string"}, "offering_id": {"type": "string"}, "effective_from": {"type": "string", "format": "date"}, "status": {"enum": ["active", "completed", "withdrawn"]}, "updated_at": {"type": "string", "format": "date-time"}}
+    }
+  }
+}
+
